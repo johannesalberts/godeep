@@ -1,0 +1,66 @@
+:root {
+  --surface: #faf9f7;
+  --surface-dim: #dadad8;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f3f1;
+  --surface-container: #efeeec;
+  --surface-container-high: #e9e8e6;
+  --surface-container-highest: #e3e2e0;
+  --on-surface: #1a1c1b;
+  --on-surface-variant: #55423f;
+  --outline: #88726f;
+  --outline-variant: #dbc1bc;
+  --primary: #7b2c22;
+  --on-primary: #ffffff;
+  --primary-container: #e67e6e;
+  --on-primary-container: #ffccc4;
+  --secondary: #586060;
+  --secondary-container: #dce4e4;
+  --tertiary: #005140;
+  --tertiary-container: #006b56;
+  --error: #ba1a1a;
+  --shadow-soft: 0 40px 40px -10px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+  --max-width: 1100px;
+  --header-h: 4.5rem;
+  --font: "Geist", system-ui, -apple-system, sans-serif;
+  --timer-card-size: min(100%, 30rem);
+  --header-bg: rgba(250, 249, 247, 0.85);
+}
+
+:root[data-theme="dark"] {
+  --surface: #101313;
+  --surface-dim: #151919;
+  --surface-container-lowest: #171b1b;
+  --surface-container-low: #1d2222;
+  --surface-container: #252b2b;
+  --surface-container-high: #2d3434;
+  --surface-container-highest: #364040;
+  --on-surface: #e7ebea;
+  --on-surface-variant: #b2bcba;
+  --outline: #83908d;
+  --outline-variant: #475350;
+  --primary: #e6a193;
+  --on-primary: #2f1511;
+  --primary-container: #88483d;
+  --on-primary-container: #ffd5cd;
+  --secondary: #bec8c6;
+  --secondary-container: #35403e;
+  --tertiary: #82d7c1;
+  --tertiary-container: #205848;
+  --error: #ffb4a9;
+  --shadow-soft: 0 40px 40px -10px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --header-bg: rgba(16, 19, 19, 0.84);
+}
+
+@media (min-width: 901px) {
+  :root {
+    --timer-card-size: min(100%, 32rem);
+  }
+}

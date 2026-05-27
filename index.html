@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GoDeep – Pomodoro-Timer für wissenschaftliche Tiefenarbeit">
+  <meta name="theme-color" content="#faf9f7">
+  <link rel="icon" type="image/svg+xml" href="css/favicon.svg">
+  <title>GoDeep</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <div class="logo">
+        <img class="logo__img" src="css/godeep_logo.svg" alt="GoDeep">
+      </div>
+      <div class="header__actions">
+        <button type="button" class="icon-btn" id="btn-insights" aria-label="Statistik und Export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16v-4M12 16V8M17 16v-6"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="Dark Mode umschalten">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="btn-about" aria-label="Über GoDeep">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="btn-settings" aria-label="Einstellungen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10"/><path d="M18 6h2"/><path d="M4 12h2"/><path d="M10 12h10"/><path d="M4 18h13"/><path d="M21 18h-2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="grid">
+      <!-- Timer -->
+      <section class="timer-col" aria-label="Timer">
+        <div class="timer-hero">
+          <div class="timer-card">
+            <div class="timer-card__phase">
+              <div class="pill-group pill-group--in-card" role="group" aria-label="Timer-Modus">
+                <button type="button" class="pill pill--sm pill--active" data-timer-mode="work">Fokus</button>
+                <button type="button" class="pill pill--sm" data-timer-mode="shortBreak">Pause</button>
+                <button type="button" class="pill pill--sm" data-timer-mode="longBreak">Lange Pause</button>
+              </div>
+            </div>
+            <div class="timer-card__clock">
+              <svg class="timer-ring" viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="timer-ring__bg" cx="50" cy="50" r="44"/>
+                <circle class="timer-ring__fg" id="timer-ring-fg" cx="50" cy="50" r="44"/>
+              </svg>
+              <div class="timer-display-center">
+                <button type="button" class="timer-display-btn" id="btn-duration" aria-label="Fokusdauer anpassen">
+                  <span class="timer-duration-hint">
+                    <svg class="timer-duration-hint__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    Dauer
+                  </span>
+                  <div class="timer-display" aria-live="polite">
+                    <span id="timer-minutes">25</span><span class="timer-sep">:</span><span id="timer-seconds">00</span>
+                  </div>
+                  <span class="timer-label" id="timer-mode-label">Schreiben</span>
+                </button>
+                <span class="cycle-badge" id="cycle-text">Fokusblock 1 / 4</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button type="button" class="btn-fab" id="btn-start" aria-label="Start">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button type="button" class="btn-fab hidden" id="btn-pause" aria-label="Pause">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+            </button>
+            <button type="button" class="btn-fab btn-fab--ghost" id="btn-reset" aria-label="Zurücksetzen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+            <button type="button" class="btn-fab btn-fab--ghost btn-fab--session" id="btn-new-session" aria-label="Neue Session">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button type="button" class="btn-fab btn-fab--ghost btn-fab--history" id="btn-history" aria-label="Session-Historie">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8"/><path d="M8 12h8"/><path d="M8 15h5"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Workspace -->
+      <section class="workspace-col" aria-label="Arbeitsbereich">
+        <div class="card card--compact">
+          <div class="card__header">
+            <h2 class="card__title">Arbeitsmodus</h2>
+          </div>
+          <p class="card__hint">Was machst du in dieser Fokusphase?</p>
+          <div class="pill-group pill-group--in-card work-modes" role="group" aria-label="Arbeitsmodus">
+            <button type="button" class="pill pill--sm pill--active" data-work-mode="schreiben">Schreiben</button>
+            <button type="button" class="pill pill--sm" data-work-mode="recherche">Recherche</button>
+            <button type="button" class="pill pill--sm" data-work-mode="ueberarbeitung">Überarbeitung</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Ziel</h2>
+            <div class="card__actions">
+              <button type="button" class="text-btn" id="goal-clear">Leeren</button>
+            </div>
+          </div>
+          <textarea class="input-goal" id="goal-input" rows="2" placeholder="Woran arbeitest du gerade?"></textarea>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Quellen</h2>
+            <div class="card__actions">
+              <button type="button" class="text-btn" id="source-clear">Leeren</button>
+            </div>
+          </div>
+          <div class="add-row">
+            <input type="text" id="source-input" placeholder="Welche Quellen möchtest du verwenden?" autocomplete="off">
+            <button type="button" class="btn-add" id="source-add" aria-label="Quelle hinzufügen">+</button>
+          </div>
+          <ul class="item-list" id="source-list"></ul>
+        </div>
+      </section>
+
+      <section class="thoughts-row" aria-label="Gedanken und Notizen">
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Gedankenparkplatz</h2>
+            <div class="card__actions">
+              <button type="button" class="text-btn" id="thought-clear">Leeren</button>
+            </div>
+          </div>
+          <div class="add-row">
+            <input type="text" id="thought-input" placeholder="Gedanke, Gegenargument, späteres To-do …" autocomplete="off">
+            <button type="button" class="btn-add" id="thought-add" aria-label="Hinzufügen">+</button>
+          </div>
+          <ul class="item-list item-list--tall" id="thought-list"></ul>
+        </div>
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Notizen</h2>
+            <div class="card__actions">
+              <button type="button" class="text-btn" id="notes-clear">Leeren</button>
+            </div>
+          </div>
+          <textarea class="input-notes" id="notes-input" rows="8" placeholder="Freitext für Ideen, Fragmente, Formulierungen …"></textarea>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Insights modal (Statistik) -->
+  <div class="modal-overlay" id="insights-modal" aria-hidden="true" role="dialog" aria-labelledby="insights-title">
+    <div class="modal modal--large">
+      <h2 class="modal__title" id="insights-title">Statistik</h2>
+
+      <section class="insights-section" aria-label="Statistik">
+        <h3 class="insights-section__title">Heute</h3>
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat__value" id="stat-minutes">0</span>
+            <span class="stat__label">Fokusminuten</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" id="stat-sessions">0</span>
+            <span class="stat__label">Sessions</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" id="stat-streak">0</span>
+            <span class="stat__label">Längste Fokusserie (Tage)</span>
+          </div>
+        </div>
+        <div class="stats-modes">
+          <span class="mode-chip" id="chip-schreiben">Schreiben <strong>0%</strong></span>
+          <span class="mode-chip" id="chip-recherche">Recherche <strong>0%</strong></span>
+          <span class="mode-chip" id="chip-ueberarbeitung">Überarbeitung <strong>0%</strong></span>
+        </div>
+        <div class="week-chart" id="week-chart" aria-label="Wochenübersicht Fokusminuten"></div>
+        <div class="today-sessions">
+          <h4 class="today-sessions__title">Sessions heute</h4>
+          <ul class="session-list" id="today-sessions-list"></ul>
+        </div>
+      </section>
+
+      <div class="modal__footer modal__footer--single">
+        <button type="button" class="btn-primary" id="insights-close">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review modal (öffnet nach Fokusblock) -->
+  <div class="modal-overlay" id="review-modal" aria-hidden="true" role="dialog" aria-labelledby="review-title">
+    <div class="modal modal--review">
+      <h2 class="modal__title" id="review-title">Kurz-Review</h2>
+      <p class="modal__hint">Optional: Halte kurz fest, was gut lief und wo du als Nächstes ansetzt.</p>
+
+      <div class="review-grid">
+        <div class="review-field">
+          <label for="review-done">Geschafft</label>
+          <textarea id="review-done" placeholder="Was ist in diesem Fokusblock gelungen?"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="review-stuck">Nächster Anknüpfungspunkt</label>
+          <textarea id="review-stuck" placeholder="Womit willst du im nächsten Block starten?"></textarea>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button type="button" class="btn-text" id="review-clear">Leeren</button>
+        <button type="button" class="btn-text" id="review-close">Später</button>
+        <button type="button" class="btn-primary" id="review-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session complete modal -->
+  <div class="modal-overlay" id="session-complete-modal" aria-hidden="true" role="dialog" aria-labelledby="session-complete-title">
+    <div class="modal modal--success">
+      <div class="success-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>
+      </div>
+      <h2 class="modal__title" id="session-complete-title">Fokusblock geschafft</h2>
+      <p class="modal__hint">Stark. Du kannst direkt schließen oder jetzt kurz ein Review festhalten.</p>
+      <div class="modal__footer modal__footer--single-row">
+        <button type="button" class="btn-text" id="session-complete-close">Schließen</button>
+        <button type="button" class="btn-primary" id="session-complete-review">Review schreiben</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historie modal -->
+  <div class="modal-overlay" id="history-modal" aria-hidden="true" role="dialog" aria-labelledby="history-title">
+    <div class="modal modal--history">
+      <div class="history-header">
+        <div>
+          <h2 class="modal__title" id="history-title">Session-Historie</h2>
+          <p class="modal__hint">Alle gespeicherten Sessions nach Endzeitpunkt.</p>
+        </div>
+        <button type="button" class="icon-btn" id="history-close" aria-label="Historie schließen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="history-layout">
+        <aside class="history-list-wrap">
+          <ul class="history-list" id="history-list"></ul>
+        </aside>
+        <section class="history-detail" id="history-detail">
+          <p class="history-empty">Session auswählen, um Ziel, Quellen, Gedanken und Review zu sehen.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session wizard modal -->
+  <div class="modal-overlay" id="session-wizard-modal" aria-hidden="true" role="dialog" aria-labelledby="wizard-title">
+    <div class="modal modal--wizard">
+      <div class="wizard-shell">
+        <header class="wizard-header">
+          <div class="wizard-header__intro">
+            <p class="wizard-eyebrow">Session vorbereiten</p>
+            <h2 class="wizard-header__title" id="wizard-title">Neue Session</h2>
+            <p class="wizard-header__desc" id="wizard-step-desc">Lege dein Ziel für diese Fokusphase fest.</p>
+          </div>
+          <button type="button" class="wizard-close" id="wizard-close" aria-label="Wizard schließen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg>
+          </button>
+        </header>
+
+        <nav class="wizard-progress" aria-label="Wizard-Fortschritt">
+          <div class="wizard-progress__track" id="wizard-progress-track">
+            <div class="wizard-progress__step is-active" data-wizard-progress="0">
+              <span class="wizard-progress__dot">1</span>
+              <span class="wizard-progress__label">Ziel</span>
+            </div>
+            <div class="wizard-progress__line" aria-hidden="true"></div>
+            <div class="wizard-progress__step" data-wizard-progress="1">
+              <span class="wizard-progress__dot">2</span>
+              <span class="wizard-progress__label">Quellen</span>
+            </div>
+            <div class="wizard-progress__line" aria-hidden="true"></div>
+            <div class="wizard-progress__step" data-wizard-progress="2">
+              <span class="wizard-progress__dot">3</span>
+              <span class="wizard-progress__label">Modus</span>
+            </div>
+            <div class="wizard-progress__line" aria-hidden="true"></div>
+            <div class="wizard-progress__step" data-wizard-progress="3">
+              <span class="wizard-progress__dot">4</span>
+              <span class="wizard-progress__label">Start</span>
+            </div>
+          </div>
+        </nav>
+
+        <div class="wizard-body">
+          <div class="wizard-panel" data-wizard-panel="ziel">
+            <div class="wizard-field-header">
+              <label class="wizard-field-label" for="wizard-goal">Ziel dieser Session</label>
+              <button type="button" class="text-btn" id="wizard-goal-clear">Leeren</button>
+            </div>
+            <textarea id="wizard-goal" class="wizard-textarea" rows="4" placeholder="Was willst du in dieser Session erreichen?"></textarea>
+            <p class="wizard-context-hint hidden" id="wizard-last-stuck-hint"></p>
+          </div>
+
+          <div class="wizard-panel hidden" data-wizard-panel="quellen">
+            <div class="wizard-field-header">
+              <p class="wizard-field-label">Bestehende Quellen</p>
+              <button type="button" class="text-btn" id="wizard-sources-clear">Auswahl leeren</button>
+            </div>
+            <div id="wizard-existing-sources" class="wizard-source-list"></div>
+
+            <p class="wizard-field-label wizard-field-label--spaced">Neue Quellen</p>
+            <div class="add-row">
+              <input type="text" id="wizard-source-input" placeholder="z. B. Kosich S. 201 – wirtschaftliche Einheit" autocomplete="off">
+              <button type="button" class="btn-add" id="wizard-source-add" aria-label="Quelle hinzufügen">+</button>
+            </div>
+            <ul class="item-list wizard-new-source-list" id="wizard-new-source-list"></ul>
+          </div>
+
+          <div class="wizard-panel hidden" data-wizard-panel="modus">
+            <div class="wizard-split">
+              <div class="wizard-split__col">
+                <p class="wizard-field-label">Arbeitsmodus</p>
+                <div class="wizard-mode-cards" role="group" aria-label="Arbeitsmodus">
+                  <button type="button" class="wizard-mode-card" data-wizard-mode="schreiben">
+                    <span class="wizard-mode-card__name">Schreiben</span>
+                    <span class="wizard-mode-card__meta" data-wizard-mode-meta="schreiben">50 Min Standard</span>
+                  </button>
+                  <button type="button" class="wizard-mode-card" data-wizard-mode="recherche">
+                    <span class="wizard-mode-card__name">Recherche</span>
+                    <span class="wizard-mode-card__meta" data-wizard-mode-meta="recherche">25 Min Standard</span>
+                  </button>
+                  <button type="button" class="wizard-mode-card" data-wizard-mode="ueberarbeitung">
+                    <span class="wizard-mode-card__name">Überarbeitung</span>
+                    <span class="wizard-mode-card__meta" data-wizard-mode-meta="ueberarbeitung">40 Min Standard</span>
+                  </button>
+                </div>
+              </div>
+              <div class="wizard-split__col">
+                <p class="wizard-field-label">Fokusdauer</p>
+                <div class="wizard-duration-cards" role="radiogroup" aria-label="Fokusdauer">
+                  <button type="button" class="wizard-duration-card" data-wizard-duration-type="mode">
+                    <span class="wizard-duration-card__name">Modus-Standard</span>
+                    <span class="wizard-duration-card__min" id="wizard-mode-duration-label">50 Min</span>
+                  </button>
+                  <button type="button" class="wizard-duration-card" data-wizard-duration-type="preset" data-wizard-preset="quick">
+                    <span class="wizard-duration-card__name">Quick</span>
+                    <span class="wizard-duration-card__min">25 Min</span>
+                  </button>
+                  <button type="button" class="wizard-duration-card" data-wizard-duration-type="preset" data-wizard-preset="focus">
+                    <span class="wizard-duration-card__name">Focus</span>
+                    <span class="wizard-duration-card__min">50 Min</span>
+                  </button>
+                  <button type="button" class="wizard-duration-card" data-wizard-duration-type="preset" data-wizard-preset="deep">
+                    <span class="wizard-duration-card__name">Deep Work</span>
+                    <span class="wizard-duration-card__min">90 Min</span>
+                  </button>
+                  <button type="button" class="wizard-duration-card wizard-duration-card--custom" data-wizard-duration-type="custom">
+                    <span class="wizard-duration-card__name">Eigene Dauer</span>
+                    <div class="wizard-duration-card__custom-row hidden" id="wizard-custom-row">
+                      <input type="number" id="wizard-duration-custom" class="wizard-duration-custom-input" min="1" max="180" placeholder="Min" inputmode="numeric">
+                      <span class="wizard-duration-card__unit">Min</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-panel hidden" data-wizard-panel="review">
+            <p class="wizard-field-label">Zusammenfassung</p>
+            <div class="wizard-summary-grid">
+              <article class="wizard-summary-card">
+                <span class="wizard-summary-card__label">Ziel</span>
+                <p class="wizard-summary-card__value" id="wizard-summary-goal">—</p>
+              </article>
+              <article class="wizard-summary-card">
+                <span class="wizard-summary-card__label">Quellen</span>
+                <p class="wizard-summary-card__value" id="wizard-summary-sources">0 ausgewählt</p>
+              </article>
+              <article class="wizard-summary-card">
+                <span class="wizard-summary-card__label">Arbeitsmodus</span>
+                <p class="wizard-summary-card__value" id="wizard-summary-mode">Schreiben</p>
+              </article>
+              <article class="wizard-summary-card">
+                <span class="wizard-summary-card__label">Dauer</span>
+                <p class="wizard-summary-card__value" id="wizard-summary-duration">Modus-Standard</p>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <footer class="wizard-footer">
+          <button type="button" class="btn-text wizard-footer__back hidden" id="wizard-back">Zurück</button>
+          <div class="wizard-footer__actions">
+            <button type="button" class="btn-ghost wizard-footer__next" id="wizard-next">Weiter</button>
+            <button type="button" class="btn-primary wizard-footer__start hidden" id="wizard-start">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              Session starten
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- Duration modal -->
+  <div class="modal-overlay" id="duration-modal" aria-hidden="true" role="dialog" aria-labelledby="duration-title">
+    <div class="modal modal--narrow">
+      <h2 class="modal__title" id="duration-title">Fokusdauer</h2>
+      <p class="modal__hint">Preset wählen oder eigene Dauer eingeben.</p>
+      <div class="duration-presets" role="group" aria-label="Zeit-Presets">
+        <button type="button" class="duration-preset-btn" data-preset="quick">
+          <span class="duration-preset-btn__name">Quick</span>
+          <span class="duration-preset-btn__min">25 Min</span>
+        </button>
+        <button type="button" class="duration-preset-btn" data-preset="focus">
+          <span class="duration-preset-btn__name">Focus</span>
+          <span class="duration-preset-btn__min">50 Min</span>
+        </button>
+        <button type="button" class="duration-preset-btn" data-preset="deep">
+          <span class="duration-preset-btn__name">Deep Work</span>
+          <span class="duration-preset-btn__min">90 Min</span>
+        </button>
+        <button type="button" class="duration-preset-btn" data-preset="">
+          <span class="duration-preset-btn__name">Modus-Standard</span>
+          <span class="duration-preset-btn__min"><span id="duration-mode-default-min">50</span> Min</span>
+        </button>
+      </div>
+      <div class="duration-custom" id="duration-custom-block">
+        <label class="duration-custom__label" for="duration-custom-min">Eigene Dauer</label>
+        <div class="duration-custom__field">
+          <input type="number" class="duration-custom__input" id="duration-custom-min" min="1" max="180" placeholder="z. B. 45" inputmode="numeric" aria-describedby="duration-custom-hint">
+          <span class="duration-custom__unit">Min</span>
+          <button type="button" class="duration-custom__apply" id="duration-custom-apply" aria-label="Eigene Dauer übernehmen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+        <span class="duration-custom__hint" id="duration-custom-hint">Enter zum Übernehmen</span>
+      </div>
+      <div class="modal__footer modal__footer--single">
+        <button type="button" class="btn-primary" id="duration-close">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settings-modal" aria-hidden="true" role="dialog" aria-labelledby="settings-title">
+    <div class="modal modal--settings">
+      <h2 class="modal__title" id="settings-title">Einstellungen</h2>
+      <p class="modal__hint">Passe Zeiten und Verhalten fuer deine Fokusarbeit an.</p>
+
+      <div class="modal__section setting-group">
+        <h3 class="setting-group__title">Pomodoro-Zeiten</h3>
+        <div class="setting-row setting-row--number">
+          <label for="set-work">Standard Arbeit</label>
+          <div class="setting-number">
+            <input type="number" id="set-work" min="1" max="120" value="25">
+            <span>Min</span>
+          </div>
+        </div>
+        <div class="setting-row setting-row--number">
+          <label for="set-short">Kurze Pause</label>
+          <div class="setting-number">
+            <input type="number" id="set-short" min="1" max="30" value="5">
+            <span>Min</span>
+          </div>
+        </div>
+        <div class="setting-row setting-row--number">
+          <label for="set-long">Lange Pause</label>
+          <div class="setting-number">
+            <input type="number" id="set-long" min="1" max="60" value="15">
+            <span>Min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__section setting-group">
+        <h3 class="setting-group__title">Arbeitsmodi</h3>
+        <div class="setting-row setting-row--toggle">
+          <label for="set-use-mode">Modus-Dauer nutzen</label>
+          <input type="checkbox" id="set-use-mode" checked>
+        </div>
+        <div class="setting-row setting-row--number">
+          <label for="set-schreiben">Schreiben</label>
+          <div class="setting-number">
+            <input type="number" id="set-schreiben" min="1" max="120" value="50">
+            <span>Min</span>
+          </div>
+        </div>
+        <div class="setting-row setting-row--number">
+          <label for="set-recherche">Recherche</label>
+          <div class="setting-number">
+            <input type="number" id="set-recherche" min="1" max="120" value="25">
+            <span>Min</span>
+          </div>
+        </div>
+        <div class="setting-row setting-row--number">
+          <label for="set-ueberarbeitung">Überarbeitung</label>
+          <div class="setting-number">
+            <input type="number" id="set-ueberarbeitung" min="1" max="120" value="40">
+            <span>Min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__section setting-group">
+        <h3 class="setting-group__title">Verhalten</h3>
+        <div class="setting-row setting-row--select">
+          <label for="set-timer-sound">Timer-Sound</label>
+          <select id="set-timer-sound" class="setting-select">
+            <option value="standard">Standard</option>
+            <option value="easy">Easy</option>
+          </select>
+        </div>
+        <div class="setting-row setting-row--toggle">
+          <label for="set-auto-break">Pause nach Fokusblock automatisch starten</label>
+          <input type="checkbox" id="set-auto-break">
+        </div>
+        <div class="setting-row setting-row--toggle">
+          <label for="set-auto-work">Neuen Fokusblock nach Pause automatisch starten</label>
+          <input type="checkbox" id="set-auto-work">
+        </div>
+        <div class="setting-row setting-row--toggle">
+          <label for="set-notify">Desktop-Benachrichtigungen anzeigen</label>
+          <input type="checkbox" id="set-notify" checked>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button type="button" class="btn-text" id="settings-close">Abbrechen</button>
+        <button type="button" class="btn-primary" id="settings-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About modal -->
+  <div class="modal-overlay" id="about-modal" aria-hidden="true" role="dialog" aria-labelledby="about-title">
+    <div class="modal modal--narrow">
+      <h2 class="modal__title" id="about-title">Über GoDeep</h2>
+      <p class="modal__hint">GoDeep ist eine Fokus-App für Deep-Work-Sessions, insb. bei wissenschaftlichem Arbeiten.</p>
+      <div class="about-owner">
+        <p class="about-owner__name">Johannes Alberts, LL.M.</p>
+        <div class="about-owner__meta-line"></div>
+        <a class="about-owner__email" href="mailto:mail@johannesalberts.de">mail@johannesalberts.de</a>
+        <a class="about-owner__website" href="https://www.johannesalberts.de" target="_blank" rel="noopener noreferrer">www.johannesalberts.de</a>
+        <div class="about-owner__social">
+          <a class="about-owner__linkedin" href="https://www.linkedin.com/in/johannes-alberts-ll-m-aab543174" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn-Profil">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.94 8.5H3.56V20h3.38V8.5Zm-1.69-1.6a1.96 1.96 0 1 0 0-3.92 1.96 1.96 0 0 0 0 3.92ZM20.44 13.43c0-3.36-1.79-4.93-4.18-4.93-1.93 0-2.79 1.06-3.27 1.81V8.5H9.61V20h3.38v-5.69c0-1.5.29-2.95 2.15-2.95 1.83 0 1.86 1.71 1.86 3.05V20h3.44v-6.57Z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="modal__footer modal__footer--single">
+        <button type="button" class="btn-primary" id="about-close">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <audio id="timer-complete" preload="auto" src="assets/timer-standard.mp3"></audio>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/midnight.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/workspace.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/insights.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/session-wizard.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/about.js"></script>
+  <script src="js/duration.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
