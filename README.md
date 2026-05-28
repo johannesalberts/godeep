@@ -120,6 +120,7 @@ git pull
 
 ```bash
 # Docker (Code-Updates im gemounteten Projektordner)
+docker compose down
 git pull
 docker compose up -d
 ```
