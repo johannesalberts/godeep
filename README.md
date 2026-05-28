@@ -45,18 +45,42 @@ GoDeep/
     timer-easy.mp3
 ```
 
-## Installation / Start
+## Lokal nutzen (Entwicklung/Test)
 
-### Option A: Direkt im Browser
+### 1) Direkt im Browser (am schnellsten)
 
 1. Repository klonen oder Ordner lokal bereitstellen.
 2. `index.html` in einem modernen Browser öffnen.
 
-### Option B: Lokaler Webserver (empfohlen)
+### 2) Lokal mit Webserver (empfohlen)
 
-1. Projekt in dein Webroot legen (z. B. XAMPP `htdocs`).
-2. Im Browser aufrufen, z. B.:
-   - `http://localhost/GoDeep/`
+1. Projekt in dein lokales Webroot legen (z. B. XAMPP `htdocs`).
+2. Im Browser aufrufen, z. B. `http://localhost/GoDeep/`.
+
+## Server-Deployment (Produktiv oder extern erreichbar)
+
+GoDeep ist eine statische Web-App (HTML, CSS, JS) ohne Build-Prozess.
+
+### 1) Klassisches Hosting (Shared Hosting / Apache / Nginx)
+
+1. Projektdateien per FTP/SFTP ins Zielverzeichnis hochladen (z. B. `public_html`, `www` oder vHost-Document-Root).
+2. Sicherstellen, dass `index.html`, `css/`, `js/` und `assets/` zusammen im selben Webroot liegen.
+3. Deployment-URL im Browser aufrufen.
+
+### 2) Docker-Deployment (einfach mit Apache)
+
+Mit Docker Compose wird ein Apache-Container gestartet, der den Projektordner als Volume einbindet.
+
+1. Docker Desktop oder Docker Engine + Compose Plugin installieren.
+2. Im Projektordner starten: `docker compose up -d`
+3. Im Browser öffnen: `http://localhost:9095`
+4. Container stoppen: `docker compose down`
+
+Der Container liefert den gemounteten Projektordner direkt aus (`./` -> `/usr/local/apache2/htdocs/`).
+
+Hinweis zur Persistenz: Die App speichert Daten pro Browser in `localStorage` (clientseitig), nicht serverseitig.
+
+Sicherheits-Hinweis: Für den externen Betrieb sollte idealerweise ein Reverse Proxy oder ein Cloudflare Tunnel vorgeschaltet werden, damit die App sicher per HTTPS erreichbar ist und über den Standardport `443` bereitgestellt wird.
 
 ## Nutzung (Kurz)
 

@@ -1,0 +1,9 @@
+services:
+  web:
+    image: httpd:2.4
+    container_name: godeep-apache
+    ports:
+      - "9095:80"
+    volumes:
+      - ./:/usr/local/apache2/htdocs/:ro
+    restart: unless-stopped
