@@ -82,6 +82,48 @@ Hinweis zur Persistenz: Die App speichert Daten pro Browser in `localStorage` (c
 
 Sicherheits-Hinweis: Für den externen Betrieb sollte idealerweise ein Reverse Proxy oder ein Cloudflare Tunnel vorgeschaltet werden, damit die App sicher per HTTPS erreichbar ist und über den Standardport `443` bereitgestellt wird.
 
+## Updates einspielen
+
+### 1) Lokal (direkt im Browser)
+
+1. Neue Version holen (z. B. per `git pull` oder Dateien überschreiben).
+2. Browser-Tab neu laden (ggf. Hard-Reload mit `Cmd+Shift+R`).
+
+### 2) Klassisches Hosting / Webserver
+
+1. Geänderte Dateien auf den Server hochladen (`index.html`, `css/`, `js/`, `assets/`).
+2. Seite neu laden; bei Cache-Problemen Browser-Cache leeren oder Hard-Reload ausführen.
+
+### 3) Docker-Deployment
+
+Bei diesem Setup wird der Projektordner als Volume gemountet. Das bedeutet:
+
+- **Code-Updates (GoDeep-Dateien):** Dateien im Projektordner aktualisieren, danach reicht meist ein Reload im Browser.
+- **Container-/Image-Updates (Apache):** Neues Image ziehen und Container neu erstellen:
+  - `docker compose pull`
+  - `docker compose up -d --force-recreate`
+
+Optional bei Problemen: `docker compose down` und danach `docker compose up -d`.
+
+### Update Quick Commands
+
+```bash
+# Lokal (Git)
+git pull
+```
+
+```bash
+# Docker (Code-Updates im gemounteten Projektordner)
+git pull
+docker compose up -d
+```
+
+```bash
+# Docker (Apache-Image aktualisieren)
+docker compose pull
+docker compose up -d --force-recreate
+```
+
 ## Nutzung (Kurz)
 
 1. Modus und Fokusdauer wählen (oder **Neue Session** starten).
