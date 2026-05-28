@@ -6,6 +6,12 @@
 
 GoDeep ist eine minimalistische Fokus-App für Deep-Work-Sessions, insbesondere beim wissenschaftlichen Arbeiten.
 
+## App-Screenshot
+
+<p align="center">
+  <img src="assets/GoDeep-Screenshot-Dashboard.png" alt="GoDeep Dashboard Screenshot" width="1000">
+</p>
+
 ## Features
 
 - Pomodoro-Timer mit Fokus-/Pause-/Lange-Pause-Phasen
