@@ -30,8 +30,13 @@ let state = {
 
 let els = {};
 let pendingReviewSessionId = null;
+let audioCtx = null;
+let completing = false;
+let baseDocumentTitle = 'GoDeep';
+let titleBlinkId = null;
 
 function initTimer() {
+  baseDocumentTitle = document.title || 'GoDeep';
   els = {
     minutes: document.getElementById('timer-minutes'),
     seconds: document.getElementById('timer-seconds'),
@@ -84,8 +89,14 @@ function initTimer() {
 
   window.addEventListener('pagehide', saveTimerState);
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') saveTimerState();
+    if (document.visibilityState === 'hidden') {
+      saveTimerState();
+      return;
+    }
+    stopTitleBlink();
+    syncTimerFromClock();
   });
+  window.addEventListener('focus', syncTimerFromClock);
 }
 
 function bindSessionCompleteModal() {
@@ -225,6 +236,11 @@ function updateCycleDisplay() {
 function startTimer() {
   if (state.isRunning) return;
 
+  completing = false;
+  stopTitleBlink();
+  unlockAudio();
+  ensureNotificationPermission();
+
   const startsFreshWorkSession =
     state.timerMode === TIMER_MODES.work &&
     state.totalSeconds > 0 &&
@@ -240,13 +256,22 @@ function startTimer() {
   state.endTime = Date.now() + state.timeLeft * 1000;
   saveTimerState();
 
-  state.timerId = setInterval(() => {
-    const remaining = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
-    state.timeLeft = remaining;
-    updateDisplay();
-    updateProgress();
-    if (remaining <= 0) onTimerComplete();
-  }, 200);
+  updateRunningTitle();
+  state.timerId = setInterval(syncTimerFromClock, 200);
+}
+
+function syncTimerFromClock() {
+  if (!state.isRunning || !state.endTime) return;
+
+  const remaining = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
+  state.timeLeft = remaining;
+  updateDisplay();
+  updateProgress();
+  updateRunningTitle();
+
+  if (remaining <= 0) {
+    onTimerComplete();
+  }
 }
 
 function pauseTimer() {
@@ -257,6 +282,7 @@ function pauseTimer() {
   state.endTime = null;
   els.startBtn.classList.remove('hidden');
   els.pauseBtn.classList.add('hidden');
+  restoreDocumentTitle();
   saveTimerState();
 }
 
@@ -322,6 +348,47 @@ function updateDisplay() {
   els.seconds.textContent = String(s).padStart(2, '0');
 }
 
+function formatTimeLeftTitle() {
+  const m = Math.floor(state.timeLeft / 60);
+  const s = state.timeLeft % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function updateRunningTitle() {
+  if (titleBlinkId || !state.isRunning) return;
+  document.title = `${formatTimeLeftTitle()} · ${baseDocumentTitle}`;
+}
+
+function signalTitleComplete() {
+  const message =
+    state.timerMode === TIMER_MODES.work ? 'Fokusblock fertig!' : 'Pause beendet!';
+  const alertTitle = `✓ ${message} · ${baseDocumentTitle}`;
+  document.title = alertTitle;
+  startTitleBlink(alertTitle);
+}
+
+function startTitleBlink(alertTitle) {
+  stopTitleBlink();
+  if (!document.hidden) return;
+
+  let showAlert = true;
+  titleBlinkId = setInterval(() => {
+    showAlert = !showAlert;
+    document.title = showAlert ? alertTitle : baseDocumentTitle;
+  }, 1200);
+}
+
+function stopTitleBlink() {
+  if (!titleBlinkId) return;
+  clearInterval(titleBlinkId);
+  titleBlinkId = null;
+}
+
+function restoreDocumentTitle() {
+  stopTitleBlink();
+  document.title = baseDocumentTitle;
+}
+
 function updateProgress() {
   const r = 44;
   const circumference = 2 * Math.PI * r;
@@ -332,6 +399,9 @@ function updateProgress() {
 }
 
 function onTimerComplete() {
+  if (completing) return;
+  completing = true;
+
   clearInterval(state.timerId);
   state.timerId = null;
   state.isRunning = false;
@@ -340,6 +410,7 @@ function onTimerComplete() {
   els.pauseBtn.classList.add('hidden');
   playCompleteSound();
   notifyComplete();
+  signalTitleComplete();
 
   const settings = GoDeepStorage.getSettings();
   let cycle = GoDeepStorage.getCycle();
@@ -423,10 +494,46 @@ function logWorkSession() {
   return sessionEntry.id;
 }
 
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+async function unlockAudio() {
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
+    const audio = document.getElementById('timer-complete');
+    if (!audio) return;
+
+    applyTimerSoundFromSettings();
+    const prevVolume = audio.volume;
+    audio.volume = 0.001;
+    await audio.play();
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = prevVolume;
+  } catch (_) {
+    /* ignore – browser may block until explicit user gesture */
+  }
+}
+
 function playCompleteSound() {
   const audio = document.getElementById('timer-complete');
   applyTimerSoundFromSettings();
+
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+
   if (audio && audio.src) {
+    audio.currentTime = 0;
     audio.play().catch(beep);
   } else {
     beep();
@@ -448,7 +555,10 @@ function applyTimerSoundFromSettings(settingsArg) {
 
 function beep() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.connect(g);
@@ -460,17 +570,22 @@ function beep() {
   } catch (_) { /* ignore */ }
 }
 
-function notifyComplete() {
-  const settings = GoDeepStorage.getSettings();
-  if (!settings.notifications) return;
-
-  if (Notification.permission === 'granted') {
-    const title =
-      state.timerMode === TIMER_MODES.work
-        ? 'GoDeep – Arbeitsblock fertig'
-        : 'GoDeep – Pause beendet';
-    new Notification(title, { body: 'Zeit für den nächsten Schritt.' });
+function ensureNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission();
   }
+}
+
+function notifyComplete() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+
+  const title =
+    state.timerMode === TIMER_MODES.work
+      ? 'GoDeep – Arbeitsblock fertig'
+      : 'GoDeep – Pause beendet';
+  new Notification(title, { body: 'Zeit für den nächsten Schritt.' });
 }
 
 function reloadFromSettings() {

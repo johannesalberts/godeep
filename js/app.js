@@ -37,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function requestNotificationPermission() {
   if (!('Notification' in window)) return;
-  const s = GoDeepStorage.getSettings();
-  if (s.notifications && Notification.permission === 'default') {
+  if (Notification.permission === 'default') {
     Notification.requestPermission();
   }
 }

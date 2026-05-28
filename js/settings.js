@@ -40,7 +40,6 @@ function populateSettingsForm() {
   document.getElementById('set-long').value = s.longBreakMinutes;
   document.getElementById('set-auto-break').checked = s.autoStartBreaks;
   document.getElementById('set-auto-work').checked = s.autoStartWork;
-  document.getElementById('set-notify').checked = s.notifications;
   document.getElementById('set-timer-sound').value = s.timerSound || 'standard';
   document.getElementById('set-use-mode').checked = s.useModeDuration;
   document.getElementById('set-schreiben').value = s.modeDurations.schreiben;
@@ -55,7 +54,6 @@ function saveSettingsFromForm() {
   s.longBreakMinutes = clampInt(document.getElementById('set-long').value, 1, 60, 15);
   s.autoStartBreaks = document.getElementById('set-auto-break').checked;
   s.autoStartWork = document.getElementById('set-auto-work').checked;
-  s.notifications = document.getElementById('set-notify').checked;
   s.timerSound = document.getElementById('set-timer-sound').value === 'easy' ? 'easy' : 'standard';
   s.useModeDuration = document.getElementById('set-use-mode').checked;
   s.modeDurations = {
