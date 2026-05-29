@@ -19,6 +19,7 @@ GoDeep ist eine minimalistische Fokus-App für Deep-Work-Sessions, insbesondere 
 - Session-Wizard mit Ziel, Quellen, Modus und Dauer
 - Session-Review mit Hinweis auf den letzten Anknuepfungspunkt
 - Session-Historie mit Detailansicht, Export und Loeschen pro Session
+- Unterbrechungs-Protokollierung per Pause (Anzahl und Dauer), sichtbar in Historie und Export
 - Statistik-Modal (Heute + Wochenansicht)
 - Light-/Dark-Mode Toggle
 - Timer-Sound-Auswahl (Standard / Easy)
@@ -137,6 +138,8 @@ docker compose up -d --force-recreate
 2. Timer starten.
 3. Nach Ablauf optional Review erfassen.
 4. Historie fuer vergangene Sessions, Export und Loeschen nutzen.
+
+**Unterbrechungen:** Im Fokus-Modus zählt jede Pause als Unterbrechung. Beim Fortsetzen wird die Dauer erfasst; nach dem Block findest du Anzahl, Gesamtzeit und Einzelzeiten in der Session-Historie.
 
 ## Daten & Persistenz
 
