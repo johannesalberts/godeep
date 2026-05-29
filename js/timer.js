@@ -36,6 +36,7 @@ let baseDocumentTitle = 'GoDeep';
 let titleBlinkId = null;
 let workBlockOpen = false;
 let interruptionLog = createEmptyInterruptionLog();
+let interruptionUiIntervalId = null;
 
 function createEmptyInterruptionLog() {
   return { activeStartedAt: null, items: [] };
@@ -50,7 +51,6 @@ function initTimer() {
     ringFg: document.getElementById('timer-ring-fg'),
     startBtn: document.getElementById('btn-start'),
     pauseBtn: document.getElementById('btn-pause'),
-    interruptionBtn: document.getElementById('btn-interruption'),
     interruptionStats: document.getElementById('interruption-stats'),
     resetBtn: document.getElementById('btn-reset'),
     cycleText: document.getElementById('cycle-text'),
@@ -60,7 +60,6 @@ function initTimer() {
 
   els.startBtn.addEventListener('click', startTimer);
   els.pauseBtn.addEventListener('click', pauseTimer);
-  els.interruptionBtn?.addEventListener('click', toggleInterruption);
   els.resetBtn.addEventListener('click', resetTimer);
   bindSessionCompleteModal();
 
@@ -197,9 +196,9 @@ function applyWorkDuration() {
 function setTimerMode(mode, options = {}) {
   const { resetTime = true } = options;
   if (state.timerMode === TIMER_MODES.work && mode !== TIMER_MODES.work) {
+    finalizeActiveInterruption();
     workBlockOpen = false;
-    interruptionLog = createEmptyInterruptionLog();
-    updateInterruptionUI();
+    resetInterruptionLog();
   }
   state.timerMode = mode;
   syncTimerModeUI(mode);
@@ -285,6 +284,9 @@ function startTimer() {
 
   if (state.timerMode === TIMER_MODES.work) {
     workBlockOpen = true;
+    if (!startsFreshWorkSession && interruptionLog.activeStartedAt) {
+      endInterruption();
+    }
   }
 
   state.isRunning = true;
@@ -325,6 +327,11 @@ function pauseTimer() {
   els.startBtn.classList.remove('hidden');
   els.pauseBtn.classList.add('hidden');
   restoreDocumentTitle();
+
+  if (state.timerMode === TIMER_MODES.work && workBlockOpen) {
+    startInterruption();
+  }
+
   updateInterruptionUI();
   saveTimerState();
 }
@@ -342,30 +349,22 @@ function resetTimer() {
 }
 
 function resetInterruptionLog() {
+  stopInterruptionUiTicker();
   interruptionLog = createEmptyInterruptionLog();
   updateInterruptionUI();
 }
 
-function toggleInterruption() {
-  if (state.timerMode !== TIMER_MODES.work || !workBlockOpen) return;
-
-  if (interruptionLog.activeStartedAt) {
-    endInterruption();
-    showToast('Unterbrechung beendet.');
-  } else {
-    startInterruption();
-    showToast('Unterbrechung gestartet.');
-  }
-}
-
 function startInterruption() {
+  if (interruptionLog.activeStartedAt) return;
   interruptionLog.activeStartedAt = Date.now();
+  startInterruptionUiTicker();
   updateInterruptionUI();
   saveTimerState();
 }
 
 function endInterruption() {
   if (!interruptionLog.activeStartedAt) return;
+  stopInterruptionUiTicker();
 
   const endedAt = Date.now();
   const durationSeconds = Math.max(1, Math.round((endedAt - interruptionLog.activeStartedAt) / 1000));
@@ -408,18 +407,26 @@ function formatDurationShort(totalSeconds) {
   return `${s} Sek`;
 }
 
+function startInterruptionUiTicker() {
+  stopInterruptionUiTicker();
+  interruptionUiIntervalId = setInterval(() => {
+    if (interruptionLog.activeStartedAt) {
+      updateInterruptionUI();
+    } else {
+      stopInterruptionUiTicker();
+    }
+  }, 1000);
+}
+
+function stopInterruptionUiTicker() {
+  if (!interruptionUiIntervalId) return;
+  clearInterval(interruptionUiIntervalId);
+  interruptionUiIntervalId = null;
+}
+
 function updateInterruptionUI() {
-  const btn = els.interruptionBtn;
   const stats = els.interruptionStats;
   const showWorkControls = state.timerMode === TIMER_MODES.work && workBlockOpen;
-
-  if (btn) {
-    btn.classList.toggle('hidden', !showWorkControls);
-    const active = !!interruptionLog.activeStartedAt;
-    btn.classList.toggle('btn-fab--interrupt-active', active);
-    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    btn.setAttribute('aria-label', active ? 'Unterbrechung beenden' : 'Unterbrechung starten');
-  }
 
   if (!stats) return;
 
@@ -449,8 +456,8 @@ function updateInterruptionUI() {
     const totalWithActive = summary.totalSeconds;
     stats.textContent =
       summary.count > 0
-        ? `Unterbrechung läuft (${formatDurationShort(activeSec)}) · ${summary.count} gesamt · ${formatDurationShort(totalWithActive)}`
-        : `Unterbrechung läuft · ${formatDurationShort(activeSec)}`;
+        ? `Pause · ${formatDurationShort(activeSec)} · ${summary.count} gesamt · ${formatDurationShort(totalWithActive)}`
+        : `Pause · ${formatDurationShort(activeSec)}`;
     return;
   }
 
@@ -510,6 +517,9 @@ function restoreTimerState() {
   updateDisplay();
   updateProgress();
   updateInterruptionUI();
+  if (interruptionLog.activeStartedAt && !state.isRunning) {
+    startInterruptionUiTicker();
+  }
   saveTimerState();
 }
 

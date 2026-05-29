@@ -203,12 +203,6 @@ a {
   font-weight: 600;
 }
 
-.btn-fab--interrupt.btn-fab--interrupt-active {
-  background: color-mix(in srgb, var(--primary-container) 88%, #c45c26 12%);
-  color: var(--on-primary);
-  border-color: transparent;
-}
-
 .session-complete-interruptions {
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
