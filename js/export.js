@@ -37,13 +37,25 @@ function buildSessionsText() {
   const lines = (log.sessions || []).map((s) => {
     const time = new Date(s.at).toLocaleString('de-DE');
     const mode = GoDeepTimer.WORK_MODE_LABELS[s.workMode] || s.workMode;
-    return `- ${time} | ${s.minutes} Min | ${mode}${s.goal ? ` | ${s.goal}` : ''}`;
+    const ub =
+      s.interruptionCount > 0
+        ? ` | ${s.interruptionCount} UB (${formatUbSeconds(s.interruptionSeconds)})`
+        : '';
+    return `- ${time} | ${s.minutes} Min | ${mode}${ub}${s.goal ? ` | ${s.goal}` : ''}`;
   });
   return `# Sessions heute (${log.date || GoDeepStorage.todayDateStr()})\n\n${lines.length ? lines.join('\n') : '(keine)'}\n\nExportiert: ${formatExportDate()}\n`;
 }
 
 function formatExportDate() {
   return new Date().toLocaleString('de-DE');
+}
+
+function formatUbSeconds(totalSeconds) {
+  const sec = Math.max(0, Math.round(Number(totalSeconds) || 0));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
 }
 
 function formatShort(iso) {

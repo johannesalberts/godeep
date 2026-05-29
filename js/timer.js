@@ -34,6 +34,12 @@ let audioCtx = null;
 let completing = false;
 let baseDocumentTitle = 'GoDeep';
 let titleBlinkId = null;
+let workBlockOpen = false;
+let interruptionLog = createEmptyInterruptionLog();
+
+function createEmptyInterruptionLog() {
+  return { activeStartedAt: null, items: [] };
+}
 
 function initTimer() {
   baseDocumentTitle = document.title || 'GoDeep';
@@ -44,6 +50,8 @@ function initTimer() {
     ringFg: document.getElementById('timer-ring-fg'),
     startBtn: document.getElementById('btn-start'),
     pauseBtn: document.getElementById('btn-pause'),
+    interruptionBtn: document.getElementById('btn-interruption'),
+    interruptionStats: document.getElementById('interruption-stats'),
     resetBtn: document.getElementById('btn-reset'),
     cycleText: document.getElementById('cycle-text'),
     modePills: document.querySelectorAll('[data-timer-mode]'),
@@ -52,6 +60,7 @@ function initTimer() {
 
   els.startBtn.addEventListener('click', startTimer);
   els.pauseBtn.addEventListener('click', pauseTimer);
+  els.interruptionBtn?.addEventListener('click', toggleInterruption);
   els.resetBtn.addEventListener('click', resetTimer);
   bindSessionCompleteModal();
 
@@ -118,10 +127,27 @@ function bindSessionCompleteModal() {
   });
 }
 
-function openSessionCompleteModal(sessionId) {
+function openSessionCompleteModal(sessionId, interruptionSummary) {
   pendingReviewSessionId = sessionId || null;
   const overlay = document.getElementById('session-complete-modal');
   if (!overlay) return;
+
+  const interruptionsEl = document.getElementById('session-complete-interruptions');
+  if (interruptionsEl) {
+    const summary = interruptionSummary || { count: 0, totalSeconds: 0 };
+    if (summary.count > 0) {
+      const label =
+        summary.count === 1
+          ? '1 Unterbrechung'
+          : `${summary.count} Unterbrechungen`;
+      interruptionsEl.textContent = `${label} · ${formatDurationShort(summary.totalSeconds)} insgesamt`;
+      interruptionsEl.classList.remove('hidden');
+    } else {
+      interruptionsEl.textContent = '';
+      interruptionsEl.classList.add('hidden');
+    }
+  }
+
   overlay.classList.add('modal-overlay--open');
   overlay.setAttribute('aria-hidden', 'false');
 }
@@ -170,6 +196,11 @@ function applyWorkDuration() {
 
 function setTimerMode(mode, options = {}) {
   const { resetTime = true } = options;
+  if (state.timerMode === TIMER_MODES.work && mode !== TIMER_MODES.work) {
+    workBlockOpen = false;
+    interruptionLog = createEmptyInterruptionLog();
+    updateInterruptionUI();
+  }
   state.timerMode = mode;
   syncTimerModeUI(mode);
 
@@ -245,8 +276,15 @@ function startTimer() {
     state.timerMode === TIMER_MODES.work &&
     state.totalSeconds > 0 &&
     state.timeLeft === state.totalSeconds;
-  if (startsFreshWorkSession && window.GoDeepWorkspace?.resetReviewForNewSession) {
-    window.GoDeepWorkspace.resetReviewForNewSession();
+  if (startsFreshWorkSession) {
+    resetInterruptionLog();
+    if (window.GoDeepWorkspace?.resetReviewForNewSession) {
+      window.GoDeepWorkspace.resetReviewForNewSession();
+    }
+  }
+
+  if (state.timerMode === TIMER_MODES.work) {
+    workBlockOpen = true;
   }
 
   state.isRunning = true;
@@ -257,6 +295,7 @@ function startTimer() {
   saveTimerState();
 
   updateRunningTitle();
+  updateInterruptionUI();
   state.timerId = setInterval(syncTimerFromClock, 200);
 }
 
@@ -268,6 +307,9 @@ function syncTimerFromClock() {
   updateDisplay();
   updateProgress();
   updateRunningTitle();
+  if (interruptionLog.activeStartedAt) {
+    updateInterruptionUI();
+  }
 
   if (remaining <= 0) {
     onTimerComplete();
@@ -283,15 +325,139 @@ function pauseTimer() {
   els.startBtn.classList.remove('hidden');
   els.pauseBtn.classList.add('hidden');
   restoreDocumentTitle();
+  updateInterruptionUI();
   saveTimerState();
 }
 
 function resetTimer() {
   pauseTimer();
+  if (state.timerMode === TIMER_MODES.work) {
+    resetInterruptionLog();
+    workBlockOpen = false;
+  }
   state.timeLeft = state.totalSeconds;
   updateDisplay();
   updateProgress();
   saveTimerState();
+}
+
+function resetInterruptionLog() {
+  interruptionLog = createEmptyInterruptionLog();
+  updateInterruptionUI();
+}
+
+function toggleInterruption() {
+  if (state.timerMode !== TIMER_MODES.work || !workBlockOpen) return;
+
+  if (interruptionLog.activeStartedAt) {
+    endInterruption();
+    showToast('Unterbrechung beendet.');
+  } else {
+    startInterruption();
+    showToast('Unterbrechung gestartet.');
+  }
+}
+
+function startInterruption() {
+  interruptionLog.activeStartedAt = Date.now();
+  updateInterruptionUI();
+  saveTimerState();
+}
+
+function endInterruption() {
+  if (!interruptionLog.activeStartedAt) return;
+
+  const endedAt = Date.now();
+  const durationSeconds = Math.max(1, Math.round((endedAt - interruptionLog.activeStartedAt) / 1000));
+  interruptionLog.items.push({
+    startedAt: new Date(interruptionLog.activeStartedAt).toISOString(),
+    endedAt: new Date(endedAt).toISOString(),
+    durationSeconds,
+  });
+  interruptionLog.activeStartedAt = null;
+  updateInterruptionUI();
+  saveTimerState();
+}
+
+function finalizeActiveInterruption() {
+  if (interruptionLog.activeStartedAt) {
+    endInterruption();
+  }
+}
+
+function getInterruptionSummary() {
+  const items = [...interruptionLog.items];
+  let totalSeconds = items.reduce((sum, item) => sum + (item.durationSeconds || 0), 0);
+
+  if (interruptionLog.activeStartedAt) {
+    const activeSeconds = Math.max(0, Math.round((Date.now() - interruptionLog.activeStartedAt) / 1000));
+    totalSeconds += activeSeconds;
+  }
+
+  return {
+    count: items.length,
+    totalSeconds,
+    items,
+  };
+}
+
+function formatDurationShort(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  if (m > 0) return `${m} Min ${s} Sek`;
+  return `${s} Sek`;
+}
+
+function updateInterruptionUI() {
+  const btn = els.interruptionBtn;
+  const stats = els.interruptionStats;
+  const showWorkControls = state.timerMode === TIMER_MODES.work && workBlockOpen;
+
+  if (btn) {
+    btn.classList.toggle('hidden', !showWorkControls);
+    const active = !!interruptionLog.activeStartedAt;
+    btn.classList.toggle('btn-fab--interrupt-active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.setAttribute('aria-label', active ? 'Unterbrechung beenden' : 'Unterbrechung starten');
+  }
+
+  if (!stats) return;
+
+  if (!showWorkControls) {
+    stats.classList.add('hidden');
+    stats.textContent = '';
+    stats.classList.remove('interruption-stats--active');
+    return;
+  }
+
+  const summary = getInterruptionSummary();
+  const hasActive = !!interruptionLog.activeStartedAt;
+  const hasData = summary.count > 0 || hasActive;
+
+  if (!hasData) {
+    stats.classList.add('hidden');
+    stats.textContent = '';
+    stats.classList.remove('interruption-stats--active');
+    return;
+  }
+
+  stats.classList.remove('hidden');
+  stats.classList.toggle('interruption-stats--active', hasActive);
+
+  if (hasActive) {
+    const activeSec = Math.max(0, Math.round((Date.now() - interruptionLog.activeStartedAt) / 1000));
+    const totalWithActive = summary.totalSeconds;
+    stats.textContent =
+      summary.count > 0
+        ? `Unterbrechung läuft (${formatDurationShort(activeSec)}) · ${summary.count} gesamt · ${formatDurationShort(totalWithActive)}`
+        : `Unterbrechung läuft · ${formatDurationShort(activeSec)}`;
+    return;
+  }
+
+  stats.textContent =
+    summary.count === 1
+      ? `1 Unterbrechung · ${formatDurationShort(summary.totalSeconds)}`
+      : `${summary.count} Unterbrechungen · ${formatDurationShort(summary.totalSeconds)}`;
 }
 
 function saveTimerState() {
@@ -301,6 +467,8 @@ function saveTimerState() {
     totalSeconds: state.totalSeconds,
     isRunning: state.isRunning,
     endTime: state.isRunning ? state.endTime : null,
+    workBlockOpen,
+    interruptionLog,
   });
 }
 
@@ -316,6 +484,9 @@ function restoreTimerState() {
   state.timerMode = saved.timerMode;
   state.totalSeconds = saved.totalSeconds || getModeMinutes(saved.timerMode) * 60;
   syncTimerModeUI(saved.timerMode);
+
+  workBlockOpen = !!saved.workBlockOpen && saved.timerMode === TIMER_MODES.work;
+  interruptionLog = normalizeInterruptionLog(saved.interruptionLog);
 
   if (saved.isRunning && saved.endTime) {
     const remaining = Math.max(0, Math.round((saved.endTime - Date.now()) / 1000));
@@ -338,7 +509,24 @@ function restoreTimerState() {
   );
   updateDisplay();
   updateProgress();
+  updateInterruptionUI();
   saveTimerState();
+}
+
+function normalizeInterruptionLog(raw) {
+  if (!raw || typeof raw !== 'object') return createEmptyInterruptionLog();
+  const items = Array.isArray(raw.items)
+    ? raw.items
+        .filter((item) => item && item.startedAt && item.endedAt)
+        .map((item) => ({
+          startedAt: item.startedAt,
+          endedAt: item.endedAt,
+          durationSeconds: Math.max(1, Number(item.durationSeconds) || 1),
+        }))
+    : [];
+  const activeStartedAt =
+    typeof raw.activeStartedAt === 'number' && raw.activeStartedAt > 0 ? raw.activeStartedAt : null;
+  return { activeStartedAt, items };
 }
 
 function updateDisplay() {
@@ -416,7 +604,11 @@ function onTimerComplete() {
   let cycle = GoDeepStorage.getCycle();
 
   if (state.timerMode === TIMER_MODES.work) {
-    const completedSessionId = logWorkSession();
+    finalizeActiveInterruption();
+    const interruptionSummary = getInterruptionSummary();
+    const completedSessionId = logWorkSession(interruptionSummary);
+    workBlockOpen = false;
+    resetInterruptionLog();
     cycle.completedInCycle = Math.min(4, cycle.completedInCycle + 1);
     GoDeepStorage.saveCycle(cycle);
     updateCycleDisplay();
@@ -436,7 +628,7 @@ function onTimerComplete() {
     }
 
     if (settings.autoStartBreaks) setTimeout(() => startTimer(), 800);
-    setTimeout(() => openSessionCompleteModal(completedSessionId), 180);
+    setTimeout(() => openSessionCompleteModal(completedSessionId, interruptionSummary), 180);
   } else {
     setTimerMode(TIMER_MODES.work);
     applyWorkDuration();
@@ -447,9 +639,10 @@ function onTimerComplete() {
   saveTimerState();
 }
 
-function logWorkSession() {
+function logWorkSession(interruptionSummary) {
   const settings = GoDeepStorage.getSettings();
   const minutes = getWorkMinutes();
+  const interruptions = interruptionSummary || getInterruptionSummary();
   const log = GoDeepStorage.getTodayLog();
   const today = GoDeepStorage.todayDateStr();
 
@@ -468,6 +661,11 @@ function logWorkSession() {
     preset: settings.activePreset,
     durationType: settings.customWorkMinutes ? 'custom' : settings.activePreset ? 'preset' : 'mode',
     goal: ws.goal ? ws.goal.slice(0, 120) : '',
+    interruptions: {
+      count: interruptions.count,
+      totalSeconds: interruptions.totalSeconds,
+      items: interruptions.items,
+    },
     snapshot: {
       goal: ws.goal || '',
       notes: ws.notes || '',
@@ -487,6 +685,8 @@ function logWorkSession() {
     minutes: sessionEntry.minutes,
     preset: sessionEntry.preset,
     goal: sessionEntry.goal,
+    interruptionCount: interruptions.count,
+    interruptionSeconds: interruptions.totalSeconds,
   });
 
   GoDeepStorage.saveTodayLog(freshLog);
@@ -634,6 +834,8 @@ function startSessionFromWizard(config) {
   GoDeepStorage.saveSettings(settings);
   updateWorkModeUI(settings.workMode);
   setTimerMode(TIMER_MODES.work, { resetTime: true });
+  resetInterruptionLog();
+  workBlockOpen = false;
   startTimer();
   return true;
 }

@@ -45,10 +45,11 @@ function renderHistoryList() {
     .map((s, idx) => {
       const end = formatDateTime(s.endedAt);
       const mode = GoDeepTimer.WORK_MODE_LABELS[s.workMode] || s.workMode || 'Fokus';
+      const interruptMeta = formatInterruptionMeta(s.interruptions);
       return `<li>
         <button type="button" class="history-item${idx === 0 ? ' is-active' : ''}" data-history-id="${s.id}">
           <span class="history-item__top">${end}</span>
-          <span class="history-item__meta">${s.minutes || 0} Min · ${escapeHtml(mode)}</span>
+          <span class="history-item__meta">${s.minutes || 0} Min · ${escapeHtml(mode)}${interruptMeta}</span>
           <span class="history-item__goal">${escapeHtml(s.goal || 'Ohne Ziel')}</span>
         </button>
       </li>`;
@@ -83,6 +84,8 @@ function renderHistoryDetail(session) {
   const reviewDone = snapshot.review?.done || '(leer)';
   const reviewStuck = snapshot.review?.stuck || '(leer)';
   const mode = GoDeepTimer.WORK_MODE_LABELS[session.workMode] || session.workMode || 'Fokus';
+  const interruptions = session.interruptions || { count: 0, totalSeconds: 0, items: [] };
+  const interruptionItems = interruptions.items || [];
 
   detail.innerHTML = `
     <div class="history-detail__head">
@@ -98,6 +101,20 @@ function renderHistoryDetail(session) {
     <div class="history-block">
       <h4>Ziel</h4>
       <p>${escapeHtml(goal)}</p>
+    </div>
+    <div class="history-block">
+      <h4>Unterbrechungen</h4>
+      ${
+        interruptions.count > 0
+          ? `<p>${interruptions.count} · ${escapeHtml(formatDurationShort(interruptions.totalSeconds))} gesamt</p>
+             <ul>${interruptionItems
+               .map(
+                 (item) =>
+                   `<li>${escapeHtml(formatDateTime(item.startedAt))} · ${escapeHtml(formatDurationShort(item.durationSeconds || 0))}</li>`
+               )
+               .join('')}</ul>`
+          : '<p>(keine)</p>'
+      }
     </div>
     <div class="history-block">
       <h4>Notizen</h4>
@@ -137,12 +154,18 @@ function exportSessionEntry(session) {
   const date = formatDateTime(session.endedAt);
   const linesSources = (snapshot.sources || []).map((s) => `- ${s.text || ''}`);
   const linesThoughts = (snapshot.thoughts || []).map((t) => `- [${t.done ? 'x' : ' '}] ${t.text || ''}`);
+  const interruptions = session.interruptions || { count: 0, totalSeconds: 0, items: [] };
+  const linesInterruptions = (interruptions.items || []).map(
+    (item) => `- ${formatDateTime(item.startedAt)} · ${formatDurationShort(item.durationSeconds || 0)}`
+  );
 
   const content = `# GoDeep Session\n\n` +
     `- Ende: ${date}\n` +
     `- Modus: ${mode}\n` +
-    `- Dauer: ${session.minutes || 0} Min\n\n` +
+    `- Dauer: ${session.minutes || 0} Min\n` +
+    `- Unterbrechungen: ${interruptions.count || 0} (${formatDurationShort(interruptions.totalSeconds || 0)})\n\n` +
     `## Ziel\n${snapshot.goal || '(leer)'}\n\n` +
+    `## Unterbrechungen\n${linesInterruptions.length ? linesInterruptions.join('\n') : '(keine)'}\n\n` +
     `## Notizen\n${snapshot.notes || '(leer)'}\n\n` +
     `## Quellen\n${linesSources.length ? linesSources.join('\n') : '(leer)'}\n\n` +
     `## Gedanken\n${linesThoughts.length ? linesThoughts.join('\n') : '(leer)'}\n\n` +
@@ -199,6 +222,19 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function formatDurationShort(totalSeconds) {
+  const sec = Math.max(0, Math.round(Number(totalSeconds) || 0));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m > 0) return `${m} Min ${s} Sek`;
+  return `${s} Sek`;
+}
+
+function formatInterruptionMeta(interruptions) {
+  if (!interruptions?.count) return '';
+  return ` · ${interruptions.count} UB · ${formatDurationShort(interruptions.totalSeconds || 0)}`;
 }
 
 window.GoDeepHistory = { initHistoryModal, openHistoryModal, closeHistoryModal };

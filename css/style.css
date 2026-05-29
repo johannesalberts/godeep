@@ -187,6 +187,35 @@ a {
   text-align: center;
 }
 
+.interruption-stats {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--on-surface-variant);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.interruption-stats--active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.btn-fab--interrupt.btn-fab--interrupt-active {
+  background: color-mix(in srgb, var(--primary-container) 88%, #c45c26 12%);
+  color: var(--on-primary);
+  border-color: transparent;
+}
+
+.session-complete-interruptions {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
+
 .timer-options {
   width: 100%;
   display: flex;
