@@ -685,6 +685,11 @@ function logWorkSession(interruptionSummary) {
         done: ws.review?.done || '',
         stuck: ws.review?.stuck || '',
       },
+      interruptions: {
+        count: interruptions.count,
+        totalSeconds: interruptions.totalSeconds,
+        items: interruptions.items,
+      },
     },
   };
 
@@ -697,6 +702,11 @@ function logWorkSession(interruptionSummary) {
     goal: sessionEntry.goal,
     interruptionCount: interruptions.count,
     interruptionSeconds: interruptions.totalSeconds,
+    interruptions: {
+      count: interruptions.count,
+      totalSeconds: interruptions.totalSeconds,
+      items: interruptions.items,
+    },
   });
 
   GoDeepStorage.saveTodayLog(freshLog);

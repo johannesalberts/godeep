@@ -131,11 +131,25 @@ function renderTodaySessions() {
       const time = new Date(s.at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
       const mode = GoDeepTimer.WORK_MODE_LABELS[s.workMode] || s.workMode;
       const goal = s.goal ? ` – ${s.goal.slice(0, 40)}${s.goal.length > 40 ? '…' : ''}` : '';
+      const interruptCount = s.interruptionCount ?? s.interruptions?.count ?? 0;
+      const interruptSeconds = s.interruptionSeconds ?? s.interruptions?.totalSeconds ?? 0;
+      const interruptMeta =
+        interruptCount > 0
+          ? ` · ${interruptCount} Unterbr. (${formatInterruptDuration(interruptSeconds)})`
+          : '';
       return `<li class="session-row" data-session-id="${s.id}">
-        <span class="session-row__text">${time} · ${s.minutes} Min · ${mode}${goal}</span>
+        <span class="session-row__text">${time} · ${s.minutes} Min · ${mode}${interruptMeta}${goal}</span>
       </li>`;
     })
     .join('');
+}
+
+function formatInterruptDuration(totalSeconds) {
+  const sec = Math.max(0, Math.round(Number(totalSeconds) || 0));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
 }
 
 window.GoDeepStats = { initStats, refresh, renderTodaySessions };
