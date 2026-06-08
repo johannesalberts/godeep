@@ -299,12 +299,20 @@
 
         <div class="wizard-body">
           <div class="wizard-panel" data-wizard-panel="ziel">
+            <div class="wizard-last-stuck hidden" id="wizard-last-stuck-wrap">
+              <div class="wizard-last-stuck__head">
+                <p class="wizard-last-stuck__label">Letzter Anknüpfungspunkt</p>
+                <button type="button" class="wizard-last-stuck__apply" id="wizard-last-stuck-apply" aria-label="In Ziel übernehmen" title="In Ziel übernehmen">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 21h16"/></svg>
+                </button>
+              </div>
+              <p class="wizard-last-stuck__text" id="wizard-last-stuck-text"></p>
+            </div>
             <div class="wizard-field-header">
               <label class="wizard-field-label" for="wizard-goal">Ziel dieser Session</label>
               <button type="button" class="text-btn" id="wizard-goal-clear">Leeren</button>
             </div>
             <textarea id="wizard-goal" class="wizard-textarea" rows="4" placeholder="Was willst du in dieser Session erreichen?"></textarea>
-            <p class="wizard-context-hint hidden" id="wizard-last-stuck-hint"></p>
           </div>
 
           <div class="wizard-panel hidden" data-wizard-panel="quellen">

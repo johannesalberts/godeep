@@ -87,6 +87,8 @@ function bindWizardInputs() {
     renderWizardSummary();
   });
 
+  document.getElementById('wizard-last-stuck-apply')?.addEventListener('click', applyLastStuckToGoal);
+
   const sourceInput = document.getElementById('wizard-source-input');
   const sourceAddBtn = document.getElementById('wizard-source-add');
 
@@ -213,37 +215,48 @@ function renderWizardSourceChoices() {
   });
 }
 
-function renderLastReviewHint() {
-  const hintEl = document.getElementById('wizard-last-stuck-hint');
-  if (!hintEl) return;
+let wizardLastStuck = '';
 
+function getLastReviewStuck() {
   const history = GoDeepStorage.getSessionHistory();
   const sessions = [...(history.sessions || [])].sort((a, b) => {
     return new Date(b.endedAt || 0).getTime() - new Date(a.endedAt || 0).getTime();
   });
 
-  let lastStuck = '';
   for (const s of sessions) {
     const text = s?.snapshot?.review?.stuck?.trim();
-    if (text) {
-      lastStuck = text;
-      break;
-    }
+    if (text) return text;
   }
 
-  if (!lastStuck) {
-    const ws = GoDeepStorage.getWorkspace();
-    lastStuck = ws.lastReviewStuck?.trim() || ws.review?.stuck?.trim() || '';
-  }
+  const ws = GoDeepStorage.getWorkspace();
+  return ws.lastReviewStuck?.trim() || ws.review?.stuck?.trim() || '';
+}
 
-  if (!lastStuck) {
-    hintEl.textContent = '';
-    hintEl.classList.add('hidden');
+function renderLastReviewHint() {
+  const wrap = document.getElementById('wizard-last-stuck-wrap');
+  const textEl = document.getElementById('wizard-last-stuck-text');
+  if (!wrap || !textEl) return;
+
+  wizardLastStuck = getLastReviewStuck();
+
+  if (!wizardLastStuck) {
+    textEl.textContent = '';
+    wrap.classList.add('hidden');
     return;
   }
 
-  hintEl.textContent = `Letzter Anknüpfungspunkt: ${lastStuck}`;
-  hintEl.classList.remove('hidden');
+  textEl.textContent = wizardLastStuck;
+  wrap.classList.remove('hidden');
+}
+
+function applyLastStuckToGoal() {
+  if (!wizardLastStuck) return;
+
+  const goalInput = document.getElementById('wizard-goal');
+  goalInput.value = wizardLastStuck;
+  goalInput.focus();
+  renderWizardSummary();
+  showToast('Anknüpfungspunkt übernommen.');
 }
 
 function renderWizardNewSources() {
