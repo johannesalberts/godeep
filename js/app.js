@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
   GoDeepTheme.initTheme();
   GoDeepAbout.initAboutModal();
   GoDeepDuration.initDurationModal();
+  GoDeepFocusMode.initFocusMode();
+  GoDeepShortcuts.renderShortcutsList();
+  GoDeepShortcuts.initShortcuts();
 
   requestNotificationPermission();
 

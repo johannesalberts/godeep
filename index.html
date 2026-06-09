@@ -84,6 +84,9 @@
             <button type="button" class="btn-fab btn-fab--ghost btn-fab--history" id="btn-history" aria-label="Session-Historie">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8"/><path d="M8 12h8"/><path d="M8 15h5"/></svg>
             </button>
+            <button type="button" class="btn-fab btn-fab--ghost btn-fab--focus" id="btn-focus-mode" aria-label="Fokusmodus – nur Timer anzeigen" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+            </button>
           </div>
         </div>
 
@@ -170,6 +173,22 @@
       </section>
     </div>
   </main>
+
+  <footer class="site-footer" id="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__line">
+        <span class="site-footer__credit">GoDeep by Johannes Alberts, LL.M.</span><span class="site-footer__sep" aria-hidden="true"> · </span><span class="site-footer__shortcuts">
+          <button type="button" class="site-footer__shortcuts-toggle" id="btn-shortcuts-hint" aria-expanded="false" aria-controls="shortcuts-popover">
+            <kbd class="site-footer__shortcuts-key">?</kbd>
+            <span>Shortcuts</span>
+          </button>
+          <span class="shortcuts-popover hidden" id="shortcuts-popover" role="dialog" aria-label="Shortcuts">
+            <span class="shortcuts-popover__list" id="shortcuts-list"></span>
+          </span>
+        </span>
+      </p>
+    </div>
+  </footer>
 
   <!-- Insights modal (Statistik) -->
   <div class="modal-overlay" id="insights-modal" aria-hidden="true" role="dialog" aria-labelledby="insights-title">
@@ -612,6 +631,8 @@
   <script src="js/about.js"></script>
   <script src="js/duration.js"></script>
   <script src="js/export.js"></script>
+  <script src="js/focus-mode.js"></script>
+  <script src="js/shortcuts.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

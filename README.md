@@ -17,19 +17,24 @@ GoDeep ist eine minimalistische Fokus-App für Deep-Work-Sessions, insbesondere 
 - Pomodoro-Timer mit Fokus-/Pause-/Lange-Pause-Phasen
 - Arbeitsmodi mit eigenen Standarddauern (Schreiben, Recherche, Überarbeitung)
 - Session-Wizard mit Ziel, Quellen, Modus und Dauer
-- Session-Review mit Hinweis auf den letzten Anknuepfungspunkt
-- Session-Historie mit Detailansicht, Export und Loeschen pro Session
+- Session-Review mit Hinweis auf den letzten Anknüpfungspunkt
+- Mehrere Notizen pro Session (Übersicht mit Cards + Detailansicht)
+- Session-Historie mit Detailansicht, Export und Löschen pro Session
 - Unterbrechungs-Protokollierung per Pause (Anzahl und Dauer), sichtbar in Historie und Export
 - Statistik-Modal (Heute + Wochenansicht)
+- Fokusmodus (nur Timer, Workspace ausgeblendet)
+- Tastenkürzel für häufige Aktionen
 - Light-/Dark-Mode Toggle
 - Timer-Sound-Auswahl (Standard / Easy)
-- Lokale Persistenz via `localStorage` (keine Server-Abhaengigkeit)
+- Desktop-Benachrichtigungen bei Timer-Ende
+- Lokale Persistenz via `localStorage` (keine Server-Abhängigkeit)
 
 ## Projektstruktur
 
 ```text
 GoDeep/
   index.html
+  docker-compose.yml
   css/
     variables.css
     style.css
@@ -41,11 +46,14 @@ GoDeep/
     app.js
     storage.js
     timer.js
+    notes.js
     workspace.js
     session-wizard.js
     history.js
     settings.js
     theme.js
+    focus-mode.js
+    shortcuts.js
     ...
   assets/
     timer-standard.mp3
@@ -137,18 +145,33 @@ docker compose up -d --force-recreate
 1. Modus und Fokusdauer wählen (oder **Neue Session** starten).
 2. Timer starten.
 3. Nach Ablauf optional Review erfassen.
-4. Historie fuer vergangene Sessions, Export und Loeschen nutzen.
+4. Historie für vergangene Sessions, Export und Löschen nutzen.
 
 **Unterbrechungen:** Im Fokus-Modus zählt jede Pause als Unterbrechung. Beim Fortsetzen wird die Dauer erfasst; nach dem Block findest du Anzahl, Gesamtzeit und Einzelzeiten in der Session-Historie.
+
+**Notizen:** Ab der zweiten Notiz wechselt GoDeep in eine Card-Übersicht mit Detailansicht pro Notiz.
+
+**Fokusmodus:** Über den Button neben den Timer-Steuerungen oder mit `F` blendest du Workspace und Gedankenparkplatz aus – nur der Timer bleibt sichtbar.
+
+## Tastenkürzel
+
+| Taste | Aktion |
+|---|---|
+| `Leertaste` | Timer starten / pausieren |
+| `N` | Neue Session |
+| `F` | Fokusmodus ein / aus |
+| `Esc` | Dialog schließen |
+| `?` | Shortcuts anzeigen |
+
+Die Shortcuts findest du im **Seitenfooter** als dezentes Popover (**„? Shortcuts“**). Weitere Credits und Kontaktinfos gibt es im Über-GoDeep-Modal. In Eingabefeldern sind die Kürzel deaktiviert, damit du normal tippen kannst.
 
 ## Daten & Persistenz
 
 - Alle Daten werden im Browser in `localStorage` gespeichert.
 - Einstellungen, Workspace-Inhalte, Timer-Zustand und Historie bleiben zwischen Browser-Neustarts erhalten.
-- Beim Loeschen von Website-Daten im Browser werden gespeicherte Inhalte entfernt.
+- Beim Löschen von Website-Daten im Browser werden gespeicherte Inhalte entfernt.
 
 ## Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz.  
 Siehe Datei [`LICENSE`](./LICENSE).
-

@@ -24,4 +24,13 @@ function closeInsightsModal(overlay) {
   overlay.setAttribute('aria-hidden', 'true');
 }
 
-window.GoDeepInsights = { initInsightsModal, openInsightsModal };
+function closeInsightsModalById() {
+  const overlay = document.getElementById('insights-modal');
+  if (overlay) closeInsightsModal(overlay);
+}
+
+window.GoDeepInsights = {
+  initInsightsModal,
+  openInsightsModal,
+  closeInsightsModal: closeInsightsModalById,
+};

@@ -860,11 +860,17 @@ function startSessionFromWizard(config) {
   return true;
 }
 
+function togglePlayPause() {
+  if (state.isRunning) pauseTimer();
+  else startTimer();
+}
+
 window.GoDeepTimer = {
   initTimer,
   reloadFromSettings,
   applyPresetFromSettings,
   startSessionFromWizard,
+  togglePlayPause,
   PRESETS,
   WORK_MODE_LABELS,
   getWorkMinutes,

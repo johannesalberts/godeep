@@ -415,4 +415,8 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-window.GoDeepSessionWizard = { initSessionWizard };
+window.GoDeepSessionWizard = {
+  initSessionWizard,
+  openSessionWizard,
+  closeSessionWizard,
+};
