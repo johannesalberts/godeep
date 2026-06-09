@@ -70,22 +70,30 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 0;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .logo__img {
   height: 4.35rem;
   width: auto;
+  max-width: 100%;
   display: block;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .header__actions {
   display: flex;
+  flex: 0 0 auto;
   gap: 0.25rem;
 }
 
@@ -2227,6 +2235,34 @@ a {
 }
 
 @media (max-width: 600px) {
+  :root {
+    --header-h: 3.75rem;
+  }
+
+  .header__inner {
+    padding: 0 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .logo__img {
+    height: 2.65rem;
+    max-width: min(11.5rem, 52vw);
+  }
+
+  .header__actions {
+    gap: 0.125rem;
+  }
+
+  .icon-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .icon-btn svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
   .timer-col {
     max-width: 100%;
     gap: 2rem;
@@ -2275,5 +2311,27 @@ a {
 
   .thoughts-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .header__inner {
+    padding: 0 0.5rem;
+    gap: 0.35rem;
+  }
+
+  .logo__img {
+    height: 2.35rem;
+    max-width: min(9rem, 44vw);
+  }
+
+  .icon-btn {
+    width: 2.05rem;
+    height: 2.05rem;
+  }
+
+  .icon-btn svg {
+    width: 1rem;
+    height: 1rem;
   }
 }
