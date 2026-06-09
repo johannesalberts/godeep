@@ -142,14 +142,30 @@
           </div>
           <ul class="item-list item-list--tall" id="thought-list"></ul>
         </div>
-        <div class="card">
+        <div class="card notes-card">
           <div class="card__header">
             <h2 class="card__title">Notizen</h2>
             <div class="card__actions">
+              <button type="button" class="text-btn hidden" id="notes-back">Zurück</button>
+              <button type="button" class="text-btn hidden" id="notes-add">+ Notiz</button>
               <button type="button" class="text-btn" id="notes-clear">Leeren</button>
             </div>
           </div>
-          <textarea class="input-notes" id="notes-input" rows="8" placeholder="Freitext für Ideen, Fragmente, Formulierungen …"></textarea>
+          <div class="notes-panel" id="notes-panel-simple">
+            <textarea class="input-notes" id="notes-input-simple" rows="8" placeholder="Freitext für Ideen, Fragmente, Formulierungen …"></textarea>
+          </div>
+          <div class="notes-panel notes-panel--stack hidden" id="notes-panel-stack">
+            <div class="notes-stack">
+              <div class="notes-views" id="notes-views">
+                <div class="notes-view notes-view--list">
+                  <ul class="notes-card-list item-list" id="notes-list"></ul>
+                </div>
+                <div class="notes-view notes-view--detail">
+                  <textarea class="input-notes" id="notes-input-detail" rows="8" placeholder="Notiz bearbeiten …"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -565,6 +581,18 @@
     </div>
   </div>
 
+  <!-- Confirm modal -->
+  <div class="modal-overlay" id="confirm-modal" aria-hidden="true" role="dialog" aria-labelledby="confirm-title">
+    <div class="modal modal--narrow">
+      <h2 class="modal__title" id="confirm-title">Bestätigen</h2>
+      <p class="modal__hint" id="confirm-message"></p>
+      <div class="modal__footer modal__footer--single-row">
+        <button type="button" class="btn-text" id="confirm-cancel">Abbrechen</button>
+        <button type="button" class="btn-primary" id="confirm-ok">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status"></div>
 
   <audio id="timer-complete" preload="auto" src="assets/timer-standard.mp3"></audio>
@@ -573,6 +601,7 @@
   <script src="js/storage.js"></script>
   <script src="js/midnight.js"></script>
   <script src="js/timer.js"></script>
+  <script src="js/notes.js"></script>
   <script src="js/workspace.js"></script>
   <script src="js/stats.js"></script>
   <script src="js/insights.js"></script>

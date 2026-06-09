@@ -5,7 +5,7 @@ let activeReviewSessionId = null;
 
 function initWorkspace() {
   bindGoal();
-  bindNotes();
+  GoDeepNotes.initNotes();
   bindThoughts();
   bindSources();
   bindReview();
@@ -24,23 +24,6 @@ function bindGoal() {
   clearBtn.addEventListener('click', () => {
     const ws = GoDeepStorage.getWorkspace();
     ws.goal = '';
-    GoDeepStorage.saveWorkspace(ws);
-    el.value = '';
-  });
-}
-
-function bindNotes() {
-  const el = document.getElementById('notes-input');
-  const clearBtn = document.getElementById('notes-clear');
-  el.addEventListener('input', debounce(() => {
-    const ws = GoDeepStorage.getWorkspace();
-    ws.notes = el.value;
-    GoDeepStorage.saveWorkspace(ws);
-  }, 300));
-
-  clearBtn.addEventListener('click', () => {
-    const ws = GoDeepStorage.getWorkspace();
-    ws.notes = '';
     GoDeepStorage.saveWorkspace(ws);
     el.value = '';
   });
@@ -159,7 +142,7 @@ function bindReview() {
 function renderAll() {
   const ws = GoDeepStorage.getWorkspace();
   document.getElementById('goal-input').value = ws.goal || '';
-  document.getElementById('notes-input').value = ws.notes || '';
+  GoDeepNotes.renderNotes();
   document.getElementById('review-done').value = ws.review?.done || '';
   document.getElementById('review-stuck').value = ws.review?.stuck || '';
   renderThoughts();

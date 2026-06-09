@@ -678,7 +678,7 @@ function logWorkSession(interruptionSummary) {
     },
     snapshot: {
       goal: ws.goal || '',
-      notes: ws.notes || '',
+      notes: window.GoDeepNotes?.getNotesForSnapshot?.() || [],
       sources: (ws.sources || []).map((s) => ({ text: s.text, createdAt: s.createdAt || null })),
       thoughts: (ws.thoughts || []).map((t) => ({ text: t.text, done: !!t.done, createdAt: t.createdAt || null })),
       review: {

@@ -35,7 +35,7 @@ const DEFAULT_WORKSPACE = {
   goal: '',
   thoughts: [],
   sources: [],
-  notes: '',
+  notes: [],
   lastReviewStuck: '',
   review: { done: '', stuck: '' },
 };

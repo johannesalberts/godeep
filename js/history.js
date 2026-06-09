@@ -80,7 +80,7 @@ function renderHistoryDetail(session) {
 
   const snapshot = session.snapshot || {};
   const goal = snapshot.goal || '(leer)';
-  const notes = snapshot.notes || '(leer)';
+  const notesHtml = renderHistoryNotes(snapshot.notes);
   const sources = snapshot.sources || [];
   const thoughts = snapshot.thoughts || [];
   const reviewDone = snapshot.review?.done || '(leer)';
@@ -122,7 +122,7 @@ function renderHistoryDetail(session) {
     </div>
     <div class="history-block">
       <h4>Notizen</h4>
-      <p>${escapeHtml(notes)}</p>
+      ${notesHtml}
     </div>
     <div class="history-block">
       <h4>Quellen (${sources.length})</h4>
@@ -171,7 +171,7 @@ function exportSessionEntry(session) {
     `- Unterbrechungen: ${interruptions.count || 0} (${formatDurationShort(interruptions.totalSeconds || 0)})\n\n` +
     `## Ziel\n${snapshot.goal || '(leer)'}\n\n` +
     `## Unterbrechungen\n${linesInterruptions.length ? linesInterruptions.join('\n') : '(keine)'}\n\n` +
-    `## Notizen\n${snapshot.notes || '(leer)'}\n\n` +
+    `## Notizen\n${GoDeepNotes.formatNotesForDisplay(snapshot.notes)}\n\n` +
     `## Quellen\n${linesSources.length ? linesSources.join('\n') : '(leer)'}\n\n` +
     `## Gedanken\n${linesThoughts.length ? linesThoughts.join('\n') : '(leer)'}\n\n` +
     `## Review\n` +
@@ -287,6 +287,25 @@ function formatInterruptionHeadline(interruptions) {
   if (!interruptions?.count) return 'Keine Unterbrechungen';
   const label = interruptions.count === 1 ? '1 Unterbrechung' : `${interruptions.count} Unterbrechungen`;
   return `${label} · ${formatDurationShort(interruptions.totalSeconds || 0)} gesamt`;
+}
+
+function renderHistoryNotes(notesData) {
+  if (Array.isArray(notesData)) {
+    const items = notesData.filter((n) => (n?.text || '').trim());
+    if (!items.length) return '<p>(leer)</p>';
+    return items
+      .map(
+        (note, index) =>
+          `<div class="history-note-entry"><p class="history-note-entry__label">Notiz ${index + 1}</p><p class="history-notes">${escapeHtml(note.text)}</p></div>`
+      )
+      .join('');
+  }
+
+  if (typeof notesData === 'string' && notesData.trim()) {
+    return `<p class="history-notes">${escapeHtml(notesData)}</p>`;
+  }
+
+  return '<p>(leer)</p>';
 }
 
 function formatInterruptionListLine(interruptions) {
