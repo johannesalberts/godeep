@@ -179,10 +179,6 @@ Bei klassischem Hosting geänderte Dateien (`index.html`, `css/`, `js/`, `assets
 
 ## Autor & Lizenz
 
-**Johannes Alberts, LL.M.**
-
-- [www.johannesalberts.de](https://www.johannesalberts.de)
-- [mail@johannesalberts.de](mailto:mail@johannesalberts.de)
-- [LinkedIn](https://www.linkedin.com/in/johannes-alberts-ll-m-aab543174)
+Johannes Alberts, LL.M.
 
 Dieses Projekt steht unter der [MIT-Lizenz](./LICENSE).
