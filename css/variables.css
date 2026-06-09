@@ -30,6 +30,7 @@
   --header-h: 4.5rem;
   --font: "Geist", system-ui, -apple-system, sans-serif;
   --timer-card-size: min(100%, 30rem);
+  --timer-clock-size: 14.5rem;
   --header-bg: rgba(250, 249, 247, 0.85);
 }
 
@@ -62,5 +63,6 @@
 @media (min-width: 901px) {
   :root {
     --timer-card-size: min(100%, 32rem);
+    --timer-clock-size: 21rem;
   }
 }
