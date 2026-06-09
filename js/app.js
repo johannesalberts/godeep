@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   GoDeepFocusMode.initFocusMode();
   GoDeepShortcuts.renderShortcutsList();
   GoDeepShortcuts.initShortcuts();
+  GoDeepMobileTimer.initMobileTimerCompact();
 
   requestNotificationPermission();
 

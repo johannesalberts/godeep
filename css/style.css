@@ -152,16 +152,184 @@ a {
   .grid {
     grid-template-columns: 1fr;
   }
+
   .timer-col {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: calc(var(--header-h) + 0.35rem);
+    z-index: 10;
+    gap: 0.85rem;
+    max-width: 100%;
+    padding-bottom: 0.15rem;
+    background: transparent;
+  }
+
+  .timer-col--compact {
+    top: var(--header-h);
+    gap: 0.35rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+
+  .timer-col--compact::before {
+    content: "";
+    position: absolute;
+    inset: 0 -1.25rem;
+    background: var(--header-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--surface-container-high);
+    z-index: -1;
+  }
+
+  .timer-hero {
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  .timer-col--compact .timer-hero {
+    gap: 0.45rem;
+  }
+
+  .timer-col {
+    align-items: stretch;
+  }
+
+  .timer-card {
+    width: 100%;
+    padding: 1rem 1.25rem 1.1rem;
+    border-radius: var(--radius-xl);
+    transition:
+      width 0.22s ease,
+      padding 0.22s ease,
+      border-radius 0.22s ease;
+  }
+
+  .timer-col--compact .timer-card {
+    width: 5.75rem;
+    aspect-ratio: 1;
+    padding: 0.3rem;
+    border-radius: 1.35rem;
+  }
+
+  .timer-col--compact .timer-card__phase {
+    display: none;
+  }
+
+  .timer-display-btn {
+    max-width: 58%;
+  }
+
+  .timer-col--compact .timer-display-btn {
+    max-width: 88%;
+  }
+
+  .timer-card__clock {
+    width: 100%;
+  }
+
+  .timer-col--compact .timer-card__clock {
+    width: 100%;
+    aspect-ratio: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .timer-card__meta {
+    padding-top: 0.5rem;
+  }
+
+  .timer-duration-hint {
+    display: none;
+  }
+
+  .timer-col--compact .timer-duration-hint,
+  .timer-col--compact .timer-label,
+  .timer-col--compact .timer-card__meta {
+    display: none;
+  }
+
+  .timer-display {
+    font-size: clamp(1.75rem, 10.5cqw, 2.55rem);
+    line-height: 1;
+  }
+
+  .timer-col--compact .timer-display {
+    font-size: 1.2rem;
+    filter: none;
+  }
+
+  .cycle-badge {
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+  }
+
+  .interruption-stats {
+    font-size: 0.6875rem;
+  }
+
+  .pill-group--in-card {
+    padding: 0.1875rem;
+    gap: 0.125rem;
+  }
+
+  .pill-group--in-card .pill--sm {
+    padding: 0.28rem 0.45rem;
+    font-size: 0.625rem;
+  }
+
+  .timer-controls {
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.35rem;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .timer-controls .btn-fab {
+    flex: 0 0 2.65rem;
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+
+  .timer-controls .btn-fab#btn-start,
+  .timer-controls .btn-fab#btn-pause {
+    flex: 0 0 2.85rem;
+    width: 2.85rem;
+    height: 2.85rem;
+  }
+
+  .timer-controls .btn-fab svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .timer-controls .btn-fab#btn-start svg,
+  .timer-controls .btn-fab#btn-pause svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .timer-col--compact .timer-controls .btn-fab {
+    flex: 0 0 2.35rem;
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .timer-col--compact .timer-controls .btn-fab#btn-start,
+  .timer-col--compact .timer-controls .btn-fab#btn-pause {
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .timer-col--compact .timer-controls {
+    width: min(100%, 16.25rem);
+    gap: 0.3rem;
   }
 }
 
 /* Timer column */
 .timer-col {
   position: sticky;
-  top: calc(var(--header-h) + 1.5rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -169,6 +337,12 @@ a {
   max-width: 36rem;
   margin: 0 auto;
   gap: 2.5rem;
+}
+
+@media (min-width: 901px) {
+  .timer-col {
+    top: calc(var(--header-h) + 1.5rem);
+  }
 }
 
 .timer-hero {
@@ -180,17 +354,34 @@ a {
 }
 
 .timer-display-center {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.timer-display-btn {
+  pointer-events: auto;
+  max-width: 58%;
+}
+
+.timer-card__meta {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 62%;
+  gap: 0.2rem;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .cycle-badge {
   display: block;
-  margin-top: 0.375rem;
+  margin: 0;
+  max-width: 100%;
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -198,17 +389,22 @@ a {
   color: var(--on-surface-variant);
   opacity: 0.65;
   text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .interruption-stats {
   display: block;
-  margin-top: 0.25rem;
-  font-size: 0.625rem;
+  margin: 0;
+  max-width: 100%;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--on-surface-variant);
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .interruption-stats--active {
@@ -320,7 +516,6 @@ a {
 .timer-card {
   position: relative;
   width: var(--timer-card-size);
-  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -361,9 +556,9 @@ a {
 
 .timer-card__clock {
   position: relative;
-  flex: 1;
   width: 100%;
-  min-height: 0;
+  aspect-ratio: 1;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -470,6 +665,12 @@ a {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--on-surface-variant);
+}
+
+@media (max-width: 900px) {
+  .timer-label {
+    display: none;
+  }
 }
 
 .timer-controls {
@@ -2409,22 +2610,8 @@ body.focus-mode .timer-col {
     height: 1.125rem;
   }
 
-  .timer-col {
-    max-width: 100%;
-    gap: 2rem;
-  }
-
-  .timer-card {
-    --timer-card-size: min(100%, 20rem);
-    border-radius: 2.25rem;
-  }
-
-  .timer-hero {
-    gap: 1.25rem;
-  }
-
-  .timer-controls {
-    gap: 0.65rem 0.85rem;
+  .timer-col--compact .timer-card {
+    width: 5.35rem;
   }
 
   .site-footer {
@@ -2477,6 +2664,37 @@ body.focus-mode .timer-col {
 }
 
 @media (max-width: 400px) {
+  .timer-controls {
+    width: min(100%, 16.5rem);
+    gap: 0.28rem;
+  }
+
+  .timer-controls .btn-fab {
+    flex: 0 0 2.4rem;
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .timer-controls .btn-fab#btn-start,
+  .timer-controls .btn-fab#btn-pause {
+    flex: 0 0 2.55rem;
+    width: 2.55rem;
+    height: 2.55rem;
+  }
+
+  .timer-col--compact .timer-controls .btn-fab {
+    flex: 0 0 2.15rem;
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .timer-col--compact .timer-controls .btn-fab#btn-start,
+  .timer-col--compact .timer-controls .btn-fab#btn-pause {
+    flex: 0 0 2.3rem;
+    width: 2.3rem;
+    height: 2.3rem;
+  }
+
   .header__inner {
     padding: 0 0.5rem;
     gap: 0.35rem;

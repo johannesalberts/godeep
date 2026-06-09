@@ -407,6 +407,13 @@ function formatDurationShort(totalSeconds) {
   return `${s} Sek`;
 }
 
+function formatDurationCompact(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  if (m >= 1) return s > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${m}m`;
+  return `${s}s`;
+}
+
 function startInterruptionUiTicker() {
   stopInterruptionUiTicker();
   interruptionUiIntervalId = setInterval(() => {
@@ -456,15 +463,15 @@ function updateInterruptionUI() {
     const totalWithActive = summary.totalSeconds;
     stats.textContent =
       summary.count > 0
-        ? `Pause · ${formatDurationShort(activeSec)} · ${summary.count} gesamt · ${formatDurationShort(totalWithActive)}`
-        : `Pause · ${formatDurationShort(activeSec)}`;
+        ? `Pause ${formatDurationCompact(activeSec)} · ${summary.count}× · Σ ${formatDurationCompact(totalWithActive)}`
+        : `Pause ${formatDurationCompact(activeSec)}`;
     return;
   }
 
   stats.textContent =
     summary.count === 1
-      ? `1 Unterbrechung · ${formatDurationShort(summary.totalSeconds)}`
-      : `${summary.count} Unterbrechungen · ${formatDurationShort(summary.totalSeconds)}`;
+      ? `1 Pause · ${formatDurationCompact(summary.totalSeconds)}`
+      : `${summary.count} Pausen · ${formatDurationCompact(summary.totalSeconds)}`;
 }
 
 function saveTimerState() {
