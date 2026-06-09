@@ -11,13 +11,13 @@ GoDeep ist eine minimalistische Fokus-App für Deep-Work-Sessions, insbesondere 
 ### Dashboard
 
 <p align="center">
-  <img src="assets/GoDeep-Screenshot-Dashboard.png" alt="GoDeep Dashboard mit Timer, Arbeitsbereich, Gedankenparkplatz und Notizen" width="1000">
+  <img src="assets/screenshot-dashboard.png" alt="GoDeep Dashboard mit Timer, Arbeitsbereich, Gedankenparkplatz und Notizen" width="1000">
 </p>
 
 ### Session-Wizard
 
 <p align="center">
-  <img src="assets/GoDeep-Screenshot-Wizard.png" alt="GoDeep Session-Wizard – Schritt Ziel festlegen" width="1000">
+  <img src="assets/screenshot-wizard.png" alt="GoDeep Session-Wizard – Schritt Ziel festlegen" width="560">
 </p>
 
 ## Features
@@ -64,8 +64,8 @@ GoDeep/
     shortcuts.js
     ...
   assets/
-    GoDeep-Screenshot-Dashboard.png
-    GoDeep-Screenshot-Wizard.png
+    screenshot-dashboard.png
+    screenshot-wizard.png
     timer-standard.mp3
     timer-easy.mp3
 ```
