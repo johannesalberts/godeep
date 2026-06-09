@@ -4,158 +4,105 @@
 
 # GoDeep
 
-GoDeep ist eine minimalistische Fokus-App für Deep-Work-Sessions, insbesondere beim wissenschaftlichen Arbeiten.
+**Fokus-App für Deep-Work-Sessions – besonders beim wissenschaftlichen Arbeiten.**
+
+GoDeep verbindet einen Pomodoro-Timer mit einem strukturierten Arbeitsbereich: Ziel, Quellen, Gedankenparkplatz, Notizen, Session-Wizard, Review und Historie. Alles läuft lokal im Browser – ohne Account, ohne Server, ohne Build-Schritt.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Lizenz-MIT-blue" alt="MIT License">
+  <img src="https://img.shields.io/badge/Build-keiner-success" alt="No build step">
+  <img src="https://img.shields.io/badge/Daten-localStorage-lightgrey" alt="localStorage only">
+  <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker ready">
+</p>
+
+## Inhalt
+
+- [Screenshots](#screenshots)
+- [Was GoDeep anders macht](#was-godeep-anders-macht)
+- [Features](#features)
+- [Schnellstart](#schnellstart)
+- [Nutzung](#nutzung)
+- [Tastenkürzel](#tastenkürzel)
+- [Deployment](#deployment)
+- [Technik & Datenschutz](#technik--datenschutz)
+- [Updates](#updates)
+- [Autor & Lizenz](#autor--lizenz)
 
 ## Screenshots
 
 ### Dashboard
 
+*Timer, Arbeitsmodus, Ziel, Quellen, Gedankenparkplatz und Notizen in einer Session.*
+
 <p align="center">
-  <img src="assets/screenshot-dashboard.png" alt="GoDeep Dashboard mit Timer, Arbeitsbereich, Gedankenparkplatz und Notizen" width="1000">
+  <img src="assets/screenshot-dashboard.png" alt="GoDeep Dashboard mit Timer, Arbeitsbereich, Gedankenparkplatz und Notizen" width="900">
 </p>
 
 ### Session-Wizard
+
+*Neue Session in vier Schritten: Ziel, Quellen, Modus, Start.*
 
 <p align="center">
   <img src="assets/screenshot-wizard.png" alt="GoDeep Session-Wizard – Schritt Ziel festlegen" width="560">
 </p>
 
+## Was GoDeep anders macht
+
+| Typischer Pomodoro-Timer | GoDeep |
+|---|---|
+| Nur Countdown | Timer + Ziel, Quellen, Gedanken, Notizen |
+| Keine Session-Struktur | Wizard, Review und Session-Historie |
+| Keine Unterbrechungsanalyse | Pausen werden gezählt und protokolliert |
+| Cloud / Account oft nötig | Lokal im Browser, `localStorage` only |
+
 ## Features
 
-- Pomodoro-Timer mit Fokus-/Pause-/Lange-Pause-Phasen
+**Fokusarbeit**
+
+- Pomodoro-Timer mit Fokus-, Pause- und Langer-Pause-Phasen
 - Arbeitsmodi mit eigenen Standarddauern (Schreiben, Recherche, Überarbeitung)
+- Fokusmodus: nur Timer sichtbar (`F` oder Button)
+- Unterbrechungs-Protokollierung per Pause (Anzahl und Dauer)
+- Timer-Sound (Standard / Easy), Desktop-Benachrichtigungen
+- Light-/Dark-Mode
+
+**Organisation & Reflexion**
+
 - Session-Wizard mit Ziel, Quellen, Modus und Dauer
 - Session-Review mit Hinweis auf den letzten Anknüpfungspunkt
-- Mehrere Notizen pro Session (Übersicht mit Cards + Detailansicht)
-- Session-Historie mit Detailansicht, Export und Löschen pro Session
-- Unterbrechungs-Protokollierung per Pause (Anzahl und Dauer), sichtbar in Historie und Export
+- Mehrere Notizen pro Session (Card-Übersicht + Detailansicht)
+- Session-Historie mit Detailansicht, Export (ZIP) und Löschen
 - Statistik-Modal (Heute + Wochenansicht)
-- Fokusmodus (nur Timer, Workspace ausgeblendet)
 - Tastenkürzel für häufige Aktionen
-- Light-/Dark-Mode Toggle
-- Timer-Sound-Auswahl (Standard / Easy)
-- Desktop-Benachrichtigungen bei Timer-Ende
-- Lokale Persistenz via `localStorage` (keine Server-Abhängigkeit)
 
-## Projektstruktur
-
-```text
-GoDeep/
-  index.html
-  docker-compose.yml
-  css/
-    variables.css
-    style.css
-    godeep_logo.png
-    godeep_logo.svg
-    godeep_logo_dark.svg
-    favicon.svg
-  js/
-    app.js
-    storage.js
-    timer.js
-    notes.js
-    workspace.js
-    session-wizard.js
-    history.js
-    settings.js
-    theme.js
-    focus-mode.js
-    shortcuts.js
-    ...
-  assets/
-    screenshot-dashboard.png
-    screenshot-wizard.png
-    timer-standard.mp3
-    timer-easy.mp3
-```
-
-## Lokal nutzen (Entwicklung/Test)
-
-### 1) Direkt im Browser (am schnellsten)
-
-1. Repository klonen oder Ordner lokal bereitstellen.
-2. `index.html` in einem modernen Browser öffnen.
-
-### 2) Lokal mit Webserver (empfohlen)
-
-1. Projekt in dein lokales Webroot legen (z. B. XAMPP `htdocs`).
-2. Im Browser aufrufen, z. B. `http://localhost/GoDeep/`.
-
-## Server-Deployment (Produktiv oder extern erreichbar)
-
-GoDeep ist eine statische Web-App (HTML, CSS, JS) ohne Build-Prozess.
-
-### 1) Klassisches Hosting (Shared Hosting / Apache / Nginx)
-
-1. Projektdateien per FTP/SFTP ins Zielverzeichnis hochladen (z. B. `public_html`, `www` oder vHost-Document-Root).
-2. Sicherstellen, dass `index.html`, `css/`, `js/` und `assets/` zusammen im selben Webroot liegen.
-3. Deployment-URL im Browser aufrufen.
-
-### 2) Docker-Deployment (einfach mit Apache)
-
-Mit Docker Compose wird ein Apache-Container gestartet, der den Projektordner als Volume einbindet.
-
-1. Docker Desktop oder Docker Engine + Compose Plugin installieren.
-2. Im Projektordner starten: `docker compose up -d`
-3. Im Browser öffnen: `http://localhost:9095`
-4. Container stoppen: `docker compose down`
-
-Der Container liefert den gemounteten Projektordner direkt aus (`./` -> `/usr/local/apache2/htdocs/`).
-
-Hinweis zur Persistenz: Die App speichert Daten pro Browser in `localStorage` (clientseitig), nicht serverseitig.
-
-Sicherheits-Hinweis: Für den externen Betrieb sollte idealerweise ein Reverse Proxy oder ein Cloudflare Tunnel vorgeschaltet werden, damit die App sicher per HTTPS erreichbar ist und über den Standardport `443` bereitgestellt wird.
-
-## Updates einspielen
-
-### 1) Lokal (direkt im Browser)
-
-1. Neue Version holen (z. B. per `git pull` oder Dateien überschreiben).
-2. Browser-Tab neu laden (ggf. Hard-Reload mit `Cmd+Shift+R`).
-
-### 2) Klassisches Hosting / Webserver
-
-1. Geänderte Dateien auf den Server hochladen (`index.html`, `css/`, `js/`, `assets/`).
-2. Seite neu laden; bei Cache-Problemen Browser-Cache leeren oder Hard-Reload ausführen.
-
-### 3) Docker-Deployment
-
-Bei diesem Setup wird der Projektordner als Volume gemountet. Das bedeutet:
-
-- **Code-Updates (GoDeep-Dateien):** Dateien im Projektordner aktualisieren, danach reicht meist ein Reload im Browser.
-- **Container-/Image-Updates (Apache):** Neues Image ziehen und Container neu erstellen:
-  - `docker compose pull`
-  - `docker compose up -d --force-recreate`
-
-Optional bei Problemen: `docker compose down` und danach `docker compose up -d`.
-
-### Update Quick Commands
+## Schnellstart
 
 ```bash
-# Lokal (Git)
-git pull
+git clone https://github.com/johannesalberts/godeep.git
+cd godeep
 ```
 
+**Variante A – direkt im Browser**
+
+`index.html` in Chrome, Firefox, Safari oder Edge öffnen.
+
+**Variante B – mit Docker**
+
 ```bash
-# Docker (Code-Updates im gemounteten Projektordner)
-docker compose down
-git pull
 docker compose up -d
+# → http://localhost:9095
 ```
 
-```bash
-# Docker (Apache-Image aktualisieren)
-docker compose pull
-docker compose up -d --force-recreate
-```
+**Variante C – lokaler Webserver**
 
-## Nutzung (Kurz)
+Projekt in ein Webroot legen (z. B. XAMPP `htdocs`) und aufrufen, z. B. `http://localhost/GoDeep/`.
 
-1. Modus und Fokusdauer wählen (oder **Neue Session** starten).
-2. Timer starten.
-3. Nach Ablauf optional Review erfassen.
-4. Historie für vergangene Sessions, Export und Löschen nutzen.
+## Nutzung
+
+1. Modus und Fokusdauer wählen – oder **Neue Session** über den Wizard starten.
+2. Timer starten und im Arbeitsbereich Ziel, Quellen und Notizen pflegen.
+3. Nach Ablauf optional ein Review erfassen.
+4. Historie, Export und Statistik für vergangene Sessions nutzen.
 
 **Unterbrechungen:** Im Fokus-Modus zählt jede Pause als Unterbrechung. Beim Fortsetzen wird die Dauer erfasst; nach dem Block findest du Anzahl, Gesamtzeit und Einzelzeiten in der Session-Historie.
 
@@ -173,15 +120,69 @@ docker compose up -d --force-recreate
 | `Esc` | Dialog schließen |
 | `?` | Shortcuts anzeigen |
 
-Die Shortcuts findest du im **Seitenfooter** als dezentes Popover (**„? Shortcuts“**). Weitere Credits und Kontaktinfos gibt es im Über-GoDeep-Modal. In Eingabefeldern sind die Kürzel deaktiviert, damit du normal tippen kannst.
+Die Shortcuts findest du im **Seitenfooter** als Popover (**„? Shortcuts“**). In Eingabefeldern sind die Kürzel deaktiviert, damit du normal tippen kannst.
 
-## Daten & Persistenz
+## Deployment
 
-- Alle Daten werden im Browser in `localStorage` gespeichert.
-- Einstellungen, Workspace-Inhalte, Timer-Zustand und Historie bleiben zwischen Browser-Neustarts erhalten.
-- Beim Löschen von Website-Daten im Browser werden gespeicherte Inhalte entfernt.
+GoDeep ist eine statische Single-Page-App (`index.html` + `css/` + `js/` + `assets/`) ohne Build-Prozess.
 
-## Lizenz
+### Klassisches Hosting (Apache / Nginx / Shared Hosting)
 
-Dieses Projekt steht unter der MIT-Lizenz.  
-Siehe Datei [`LICENSE`](./LICENSE).
+1. Projektdateien per FTP/SFTP ins Zielverzeichnis hochladen (`public_html`, `www` oder Document-Root).
+2. Sicherstellen, dass `index.html`, `css/`, `js/` und `assets/` im selben Webroot liegen.
+3. Deployment-URL im Browser aufrufen.
+
+### Docker
+
+```bash
+docker compose up -d      # starten → http://localhost:9095
+docker compose down       # stoppen
+```
+
+Der Container mountet den Projektordner read-only nach `/usr/local/apache2/htdocs/`.
+
+**HTTPS:** Für externen Betrieb einen Reverse Proxy oder Cloudflare Tunnel vorschalten, damit die App sicher über Port `443` erreichbar ist.
+
+## Technik & Datenschutz
+
+- **Architektur:** Statische Web-App – Timer (`timer.js`), Workspace & Wizard, Persistenz (`storage.js`), Export (`export.js`).
+- **Daten:** Alles wird clientseitig in `localStorage` gespeichert. Keine Accounts, kein Tracking, keine Server-Kommunikation.
+- **Persistenz:** Einstellungen, Workspace, Timer-Zustand und Historie bleiben zwischen Browser-Neustarts erhalten. Beim Löschen von Website-Daten im Browser gehen gespeicherte Inhalte verloren.
+- **Browser:** Moderne Browser (Chrome, Firefox, Safari, Edge).
+
+```
+GoDeep/
+  index.html          # Einstieg
+  docker-compose.yml
+  css/                # Styles, Logos, Favicon
+  js/                 # App-Logik (Timer, Workspace, Wizard, Historie, …)
+  assets/             # Screenshots, Timer-Sounds
+```
+
+## Updates
+
+```bash
+git pull
+# Browser-Tab neu laden (ggf. Cmd+Shift+R)
+```
+
+**Docker (Code im gemounteten Ordner):** Dateien aktualisieren, Container läuft weiter – Reload im Browser reicht.
+
+**Docker (Apache-Image):**
+
+```bash
+docker compose pull
+docker compose up -d --force-recreate
+```
+
+Bei klassischem Hosting geänderte Dateien (`index.html`, `css/`, `js/`, `assets/`) hochladen und neu laden.
+
+## Autor & Lizenz
+
+**Johannes Alberts, LL.M.**
+
+- [www.johannesalberts.de](https://www.johannesalberts.de)
+- [mail@johannesalberts.de](mailto:mail@johannesalberts.de)
+- [LinkedIn](https://www.linkedin.com/in/johannes-alberts-ll-m-aab543174)
+
+Dieses Projekt steht unter der [MIT-Lizenz](./LICENSE).
