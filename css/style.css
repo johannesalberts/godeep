@@ -151,6 +151,7 @@ a {
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
   .timer-col {
@@ -870,8 +871,8 @@ body.focus-mode .timer-col {
 .thoughts-row {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+  grid-template-columns: subgrid;
+  gap: inherit;
 }
 
 .card {
@@ -2655,9 +2656,6 @@ body.focus-mode .timer-col {
     grid-template-columns: 1fr;
   }
 
-  .thoughts-row {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 400px) {
